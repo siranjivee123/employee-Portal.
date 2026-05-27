@@ -1,0 +1,55 @@
+.success-container {
+  position: relative;
+  text-align: center;
+  padding: 25px;
+}
+
+/*  CLOSE BUTTON */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  background-color: red;
+  border: none;
+  font-size: 22px;
+  color:white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.close-btn:hover {
+  transform: scale(1.2);
+}
+h2 {
+  color: #2e7d32;   
+  margin-bottom: 10px;
+}
+
+
+.emp-id {
+  color: #555;
+  font-size: 15px;
+}
+
+
+.emp-id strong {
+  color: #1976d2;   
+  font-size: 16px;
+}
+.btn-group button {
+  background-color: #1976d2;   
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.btn-group button:hover {
+  background-color: #0d47a1;   
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}

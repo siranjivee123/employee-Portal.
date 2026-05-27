@@ -1,0 +1,31 @@
+<div class="success-container">
+
+
+  <button class="close-btn" (click)="close()">
+    X
+  </button>
+
+  <!-- ICON -->
+  <div class="icon">
+  </div>
+
+  <!-- TITLE -->
+  <h2>Employee Created Successfully</h2>
+
+  <!-- EMPLOYEE ID -->
+  <p class="emp-id">
+    Employee ID:
+    <strong>{{ data.employeeId }}</strong>
+  </p>
+
+  <!-- BUTTON -->
+  <div class="btn-group">
+
+    <button mat-raised-button color="primary"
+            (click)="goToEmployee()">
+      Go to Employee
+    </button>
+
+  </div>
+
+</div>

@@ -1,0 +1,114 @@
+<div class="leave-container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <button class="add-btn"
+      *ngIf="role === 'employee' || role === 'manager'"
+      (click)="goToAdd()">
+      Add Leave
+    </button>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-section">
+
+    <input type="text"
+      placeholder="Search by Leave Type"
+      [(ngModel)]="filters.leaveType"
+      (input)="applyFilters()" />
+
+    <select [(ngModel)]="filters.status" (change)="applyFilters()">
+      <option value="">All Status</option>
+      <option>Pending</option>
+      <option>Approved</option>
+      <option>Rejected</option>
+    </select>
+
+    <input type="date" [(ngModel)]="filters.fromDate" (change)="applyFilters()" />
+    <input type="date" [(ngModel)]="filters.toDate" (change)="applyFilters()" />
+
+  </div>
+
+  <div class="table-wrapper">
+
+    <!-- TABLE -->
+    <table class="leave-table">
+
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Type</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!--  dataSource -->
+<tr *ngFor="let leave of getPaginatedData(); let i = index">
+          <td>{{  pageIndex * pageSize + i + 1  }} </td>
+          <td>{{ leave.leaveType }}</td>
+          <td>{{ leave.fromDate | date }}</td>
+          <td>{{ leave.toDate | date }}</td>
+
+          <td>
+            <span [ngClass]="leave?.status?.toLowerCase()">
+              {{ leave.status }}
+            </span>
+          </td>
+
+          <td>
+
+            <button (click)="openPopup(leave)">View</button>
+
+            <button *ngIf="leave.status === 'Pending' && (role === 'admin' || role === 'manager')"
+              (click)="approveLeave(leave._id)">
+              Approve
+            </button>
+
+            <button *ngIf="leave.status === 'Pending' && (role === 'admin' || role === 'manager')"
+              (click)="rejectLeave(leave._id)">
+              Reject
+            </button>
+
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!--  PAGINATOR -->
+  <mat-paginator
+  [length]="dataSource.data.length"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="[5, 10, 25, 50]"
+  showFirstLastButtons
+  (page)="onPageChange($event)">
+</mat-paginator>
+
+  <!-- POPUP -->
+  <div class="popup-overlay" *ngIf="showPopup">
+
+    <div class="popup">
+
+      <h2>Leave Details</h2>
+
+      <p><b>Employee:</b> {{ selectedLeave?.employeeName }}</p>
+      <p><b>Type:</b> {{ selectedLeave?.leaveType }}</p>
+      <p><b>From:</b> {{ selectedLeave?.fromDate | date }}</p>
+      <p><b>To:</b> {{ selectedLeave?.toDate | date }}</p>
+      <p><b>Description:</b> {{ selectedLeave?.description }}</p>
+      <p><b>Status:</b> {{ selectedLeave?.status }}</p>
+
+      <button (click)="closePopup()">Close</button>
+
+    </div>
+
+  </div>
+
+</div>

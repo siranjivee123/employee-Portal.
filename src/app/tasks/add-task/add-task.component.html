@@ -1,0 +1,114 @@
+<div class="form-container">
+  <mat-card class="form-card">
+
+    <h2 class="title">Add Task Details</h2><br>
+
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+
+   <!-- Ticket -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Ticket</mat-label>
+        <input matInput formControlName="ticket">
+        <mat-error *ngIf="taskForm.get('ticket')?.touched && taskForm.get('ticket')?.invalid">
+          Please Enter ticket
+        </mat-error>
+      </mat-form-field>
+
+  <!-- Description -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description"></textarea>
+        <mat-error *ngIf="taskForm.get('description')?.touched && taskForm.get('description')?.invalid">
+          Please Enter description
+        </mat-error>
+      </mat-form-field>
+
+  <!-- Project -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Project</mat-label>
+        <mat-select formControlName="project">
+
+          <mat-option value=""> Select Project </mat-option>
+          
+          <mat-option *ngFor="let p of projectList" [value]="p._id">
+            {{ p.name}}
+          </mat-option>
+
+        </mat-select>
+
+        <mat-error *ngIf="taskForm.get('project')?.touched && taskForm.get('project')?.invalid">
+          Please select Project
+        </mat-error>
+      </mat-form-field>
+
+  <!-- Shift -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Shift</mat-label>
+        <mat-select formControlName="shift">
+          <mat-option value="AM">AM</mat-option>
+          <mat-option value="PM">PM</mat-option>
+        </mat-select>
+
+        <mat-error *ngIf="taskForm.get('shift')?.touched && taskForm.get('shift')?.invalid">
+          Please select  any shift
+        </mat-error>
+      </mat-form-field>
+
+   <!-- Assigned -->
+     <mat-form-field appearance="outline" class="full-width">
+  <mat-label>Assigned By</mat-label>
+
+  <mat-select formControlName="assignedBy">
+
+    <mat-option *ngFor="let emp of assignedByList" [value]="emp._id">
+      {{ emp.name }}
+    </mat-option>
+
+  </mat-select>
+
+  <mat-error *ngIf="taskForm.get('assignedBy')?.touched && taskForm.get('assignedBy')?.invalid">
+    Please select Assigned person
+  </mat-error>
+
+</mat-form-field>
+  <!-- Effort -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Effort (Hours)</mat-label>
+        <input matInput type="number" formControlName="effort">
+
+        <mat-error *ngIf="taskForm.get('effort')?.touched && taskForm.get('effort')?.invalid">
+          Please Enter effort
+        </mat-error>
+      </mat-form-field>
+       <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="In progress">In progress</mat-option>
+          <mat-option value="Completed">completed</mat-option>
+          <mat-option value="pending">pending</mat-option>
+        </mat-select>
+
+        <mat-error *ngIf="taskForm.get('status')?.invalid">
+          Please select status
+        </mat-error>
+      </mat-form-field>
+
+      
+
+  <!-- Buttons -->
+      <div class="actions">
+
+        <button mat-raised-button class="save-btn" type="submit">
+          Save Task
+        </button>
+
+        <button mat-raised-button class="cancel-btn"
+                type="button"
+                (click)="router.navigate(['tasks'])"> Cancel </button>
+
+      </div>
+
+    </form>
+
+  </mat-card>
+</div>

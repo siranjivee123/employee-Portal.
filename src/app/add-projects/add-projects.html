@@ -1,0 +1,114 @@
+
+<div class="form-container">
+  <mat-card class="form-card">
+
+    <h2 class="title">Add Project Details</h2><br>
+
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+
+<!-- Project Name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Project Name</mat-label>
+        <input matInput formControlName="name">
+        <mat-error *ngIf="projectForm.get('name')?.invalid">
+          please Enter Project Name
+        </mat-error>
+      </mat-form-field>
+
+ <!-- Description -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description"></textarea>
+        <mat-error *ngIf="projectForm.get('description')?.invalid">
+          please Enter Description
+        </mat-error>
+      </mat-form-field>
+
+ <!-- Category -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="category">
+          <mat-option value="IT">IT</mat-option>
+          <mat-option value="Finance">Finance</mat-option>
+          <mat-option value="HR">HR</mat-option>
+        </mat-select>
+        <mat-error *ngIf="projectForm.get('category')?.invalid">
+          Please select category
+        </mat-error>
+      </mat-form-field>
+
+<!-- Project Manager --->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Project Managers</mat-label>
+
+        <mat-select formControlName="manager" multiple>
+          <mat-select-trigger>
+            {{ projectForm.value.manager?.length || 0 }} selected
+          </mat-select-trigger>
+
+          <mat-option *ngFor="let m of managersList" [value]="m._id">
+            {{ m.name }}
+          </mat-option>
+        </mat-select>
+
+        <mat-error *ngIf="projectForm.get('manager')?.invalid">
+          Please select at least one manager
+        </mat-error>
+      </mat-form-field>
+
+<!----Assigned Employees --->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Assigned Employees</mat-label>
+
+        <mat-select formControlName="employees" multiple>
+          <mat-select-trigger>
+            {{ projectForm.value.employees?.length || 0 }} selected
+          </mat-select-trigger>
+
+          <mat-option *ngFor="let emp of employeeList" [value]="emp._id">
+            {{ emp.name }}
+          </mat-option>
+        </mat-select>
+
+        <mat-error *ngIf="projectForm.get('employees')?.invalid">
+          Please select employees
+        </mat-error>
+      </mat-form-field>
+
+  
+ <!-- Status -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="In Progress">In Progress</mat-option>
+          <mat-option value="Completed">Completed</mat-option>
+          <mat-option value="Pending">Pending</mat-option>
+        </mat-select>
+
+        <mat-error *ngIf="projectForm.get('status')?.invalid">
+          Please select status
+        </mat-error>
+      </mat-form-field>
+
+
+
+<!-- Buttons -->
+      <div class="actions">
+
+        <button mat-raised-button class="save-btn" type="submit">
+          Save Project
+        </button>
+
+        <button mat-raised-button class="cancel-btn"
+                type="button"
+                (click)="router.navigate(['/projects'])">
+          Cancel
+        </button>
+
+      </div>
+
+    </form>
+
+  </mat-card>
+
+</div>

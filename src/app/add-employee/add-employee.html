@@ -1,0 +1,246 @@
+<div class="page-center">
+  <div class="form-container">
+
+    <h2>Add Employee</h2>
+
+    <mat-horizontal-stepper linear #stepper>
+
+      <!--  STEP 1-->
+      <mat-step [stepControl]="basicForm">
+        <form [formGroup]="basicForm">
+
+          <!-- NAME -->
+          <div class="field">
+            <input placeholder="Enter Name" formControlName="name">
+            <div class="error"
+              *ngIf="basicForm.get('name')?.touched && basicForm.get('name')?.invalid">
+              Please enter name
+            </div>
+          </div>
+
+          <!-- EMAIL -->
+          <div class="field">
+            <input placeholder="Enter Email" formControlName="email">
+            <div class="error"
+              *ngIf="basicForm.get('email')?.touched && basicForm.get('email')?.invalid">
+              Please enter valid email
+            </div>
+          </div>
+
+          <!-- PHONE -->
+          <div class="field">
+            <input placeholder="Enter Phone" formControlName="phone">
+            <div class="error"
+              *ngIf="basicForm.get('phone')?.touched && basicForm.get('phone')?.invalid">
+              Please enter valid phone number
+            </div>
+          </div>
+
+          <!-- ADDRESS -->
+          <div class="field">
+            <input placeholder="Enter Address" formControlName="address">
+            <div class="error"
+              *ngIf="basicForm.get('address')?.touched && basicForm.get('address')?.invalid">
+              Please enter address
+            </div>
+          </div>
+
+          <!-- STATE -->
+         <div class="field">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Select State</mat-label>
+
+    <mat-select formControlName="state" (selectionChange)="onStateChange()">
+
+      <!-- SEARCH BOX -->
+      <mat-option>
+        <input matInput
+               placeholder="Search state..."
+               (keyup)="filterStates($event)"
+               class="dropdown-search">
+      </mat-option>
+
+      <!-- HEADER -->
+      <mat-option disabled class="table-header">
+        <div class="table-row">
+          <span>Select State</span>
+        </div>
+      </mat-option>
+
+      <!-- DATA -->
+      <mat-option *ngFor="let s of filteredStates" [value]="s.name">
+        <div class="table-row">
+          <span>{{ s.name }}</span>
+        </div>
+      </mat-option>
+
+    </mat-select>
+
+    <mat-error *ngIf="basicForm.get('state')?.invalid">
+      Please select state
+    </mat-error>
+  </mat-form-field>
+</div>
+          <!-- CITY -->
+  <div class="field">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Select City</mat-label>
+
+    <mat-select formControlName="city">
+
+      <!-- SEARCH -->
+      <mat-option>
+        <input matInput
+               placeholder="Search city..."
+               (keyup)="filterCities($event)"
+               class="dropdown-search">
+      </mat-option>
+
+      <!-- HEADER -->
+      <mat-option disabled class="table-header">
+        <div class="table-row">
+          <span> Select City </span>
+        </div>
+      </mat-option>
+
+      <!-- DATA -->
+      <mat-option *ngFor="let c of filteredCities" [value]="c">
+        <div class="table-row">
+          <span>{{ c }}</span>
+        </div>
+      </mat-option>
+
+    </mat-select>
+
+    <mat-error *ngIf="basicForm.get('city')?.invalid">
+      Please select city
+    </mat-error>
+  </mat-form-field>
+</div>
+          <!-- ZIP -->
+          <div class="field">
+            <input placeholder="Enter Zip Code" formControlName="zip">
+            <div class="error"
+              *ngIf="basicForm.get('zip')?.touched && basicForm.get('zip')?.invalid">
+              Please enter zip code
+            </div>
+          </div>
+
+          <!-- PROFILE IMAGE -->
+          <div class="field">
+            <label class="label">Profile Image</label>
+
+            <div class="upload-box">
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onFileChange($event)"
+                hidden
+                #fileInput
+              >
+
+              <button mat-stroked-button type="button"
+                (click)="fileInput.click()">
+                Choose Image
+              </button>
+
+              <div *ngIf="selectedFile" class="file-name">
+                Selected: {{ selectedFile.name }}
+              </div>
+            </div>
+
+           
+          </div>
+
+          <!-- NEXT -->
+          <div class="btn-group">
+            <button mat-raised-button color="primary"
+              type="button"
+              (click)="goNext(stepper)">
+              Next
+            </button>
+          </div>
+
+        </form>
+      </mat-step>
+      
+
+      <!-- STEP 2  -->
+      <mat-step [stepControl]="techForm">
+        <form [formGroup]="techForm">
+
+          <!-- ROLE -->
+         <mat-form-field appearance="outline" class="full-width small-field">
+  <mat-label>Select Role</mat-label>
+  <mat-select formControlName="role">
+    <mat-option *ngFor="let r of roles" [value]="r">
+      {{ r }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+          <!-- SHIFT -->
+         <mat-form-field appearance="outline" class="full-width small-field">
+  <mat-label>Select Shift</mat-label>
+  <mat-select formControlName="shift">
+    <mat-option value="AM">AM</mat-option>
+    <mat-option value="PM">PM</mat-option>
+  </mat-select>
+</mat-form-field>
+
+          <!-- PROJECTS
+          <div class="field">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Projects</mat-label>
+              <mat-select formControlName="projects" multiple>
+                <mat-option *ngFor="let p of projectsList" [value]="p._id">
+                  {{ p.name}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="techForm.get('projects')?.invalid">
+                Please select projects
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- MANAGERS
+          <div class="field">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Managers</mat-label>
+              <mat-select formControlName="managers" multiple>
+                <mat-option *ngFor="let m of managersList" [value]="m._id">
+                  {{ m.name}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="techForm.get('managers')?.invalid">
+                Please select managers
+              </mat-error>
+            </mat-form-field>
+          </div>--->
+
+          <!-- BUTTONS -->
+          <div class="btn-group">
+
+            <button mat-button matStepperPrevious type="button">
+              Back
+            </button>
+
+           
+
+            <button mat-raised-button color="primary"
+              type="button"
+              (click)="onSubmit()"
+              [disabled]="techForm.invalid">
+              Submit
+            </button>
+
+          </div>
+
+        </form>
+      </mat-step>
+
+    </mat-horizontal-stepper>
+
+  </div>
+</div>
+

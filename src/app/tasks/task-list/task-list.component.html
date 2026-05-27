@@ -1,0 +1,164 @@
+<!-- Header -->
+<div class="header">
+</div>
+
+<!-- Top actions -->
+<div class="top-actions">
+  <button class="add-btn" routerLink="/add-task">
+    Add New Task
+  </button>
+
+  <div class="filters">
+
+<!-- Search -->
+    <input
+      type="text"
+      placeholder="Search by ticket"
+      [(ngModel)]="searchText"
+      (input)="applyFilter()"/>
+
+<!-- Date -->
+    <input
+      type="date"
+      [(ngModel)]="selectedDate"
+      (change)="applyFilter()" />
+
+<!-- Project -->
+    <input
+      type="text"
+      placeholder="Search by project"
+      [(ngModel)]="selectedProject"
+      (input)="applyFilter()"/>
+    
+
+<!-- Sort -->
+    <select [(ngModel)]="sortOption" (change)="applyFilter()">
+      <option value="">Sort By Ticket / Project</option>
+      <option value="ticket-asc">Ticket (Asc- Dsc)</option>
+      <option value="ticket-desc">Ticket (Dsc - Asc)</option>
+      <option value="project-asc">Project (A - Z)</option>
+      <option value="project-desc">Project (Z - A)</option>
+    </select>
+
+  </div>
+</div>
+
+<!-- Table -->
+<div class="table-card">
+  <h3>Task List</h3>
+<div class="table-scroll">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+<!-- SNO -->
+  <ng-container matColumnDef="sno">
+  <th mat-header-cell *matHeaderCellDef> S.No </th>
+  <td mat-cell *matCellDef="let t; let i = index">
+    {{ i + 1 }}
+  </td>
+</ng-container>
+<!-- Ticket -->
+    <ng-container matColumnDef="ticket">
+      <th mat-header-cell *matHeaderCellDef> Ticket </th>
+      <td mat-cell *matCellDef="let t"> {{ t.ticket }} </td>
+    </ng-container>
+
+<!-- Description -->
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef> Description </th>
+      <td mat-cell *matCellDef="let t"> {{ t.description }} </td>
+    </ng-container>
+
+<!-- Project -->
+    <ng-container matColumnDef="project">
+      <th mat-header-cell *matHeaderCellDef> Project </th>
+      <td mat-cell *matCellDef="let t"> {{ t.project?.name }} </td>
+    </ng-container>
+
+<!-- Shift -->
+    <ng-container matColumnDef="shift">
+      <th mat-header-cell *matHeaderCellDef> Shift </th>
+      <td mat-cell *matCellDef="let t"> {{ t.shift }} </td>
+    </ng-container>
+
+<!-- Assigned By -->
+    <ng-container matColumnDef="assignedBy">
+      <th mat-header-cell *matHeaderCellDef> Assigned By </th>
+      <td mat-cell *matCellDef="let t"> {{ t.assignedBy?.name }} </td>
+    </ng-container>
+
+<!-- Effort -->
+    <ng-container matColumnDef="effort">
+      <th mat-header-cell *matHeaderCellDef> Effort (hrs) </th>
+      <td mat-cell *matCellDef="let t"> {{ t.effort }} </td>
+    </ng-container>
+
+<!-- Date -->
+    <ng-container matColumnDef="date">
+  <th mat-header-cell *matHeaderCellDef> Date & time</th>
+  <td mat-cell *matCellDef="let task">
+    {{ task.createdAt| date:'dd/MM/yyyy, hh:mm:ss a' }}
+  </td>
+</ng-container>
+
+<!-- Status -->
+<ng-container matColumnDef="status">
+  <th mat-header-cell *matHeaderCellDef> Status </th>
+  <td mat-cell *matCellDef="let t">
+    {{ t.status }}
+  </td>
+</ng-container>
+
+<!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let t">
+
+        <button (click)="viewTask(t)">View</button>
+        <button (click)="editTask(t)">Edit</button>
+        <button (click)="deleteTask(t._id)">Delete</button>
+
+      </td>
+    </ng-container>
+
+<!-- Rows -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+<tr class="mat-row" *matNoDataRow>
+  <td class="mat-cell" colspan="8" style="text-align:center; padding:20px;">
+    No Tasks Found!
+  </td>
+</tr>
+  </table>
+</div>
+</div>
+
+<!-- Pagination -->
+<mat-paginator
+  [pageSize]="10"
+  [pageSizeOptions]="[5, 10, 25, 50]"
+  showFirstLastButtons>
+</mat-paginator>
+
+<!--  TASK POPUP -->
+<div class="popup" *ngIf="showPopup">
+
+<!-- HEADER -->
+  <div class="popup-header">
+    <span>Task Details</span>
+    <button class="close-btn" (click)="closePopup()">X</button>
+  </div>
+
+<!-- BODY -->
+  <div class="popup-body">
+    <p><b>Ticket:</b> {{ selectedTask?.ticket }}</p>
+    <p><b>Description:</b> {{ selectedTask?.description }}</p>
+        <p><b>Shift:</b> {{ selectedTask?.shift }}</p>
+    <p><b>Project:</b> {{ selectedTask?.project.name }}</p>
+    <p><b>Assigned By:</b> {{ selectedTask?.assignedBy.name }}</p>
+    <p><b>Effort:</b> {{ selectedTask?.effort }} hrs</p>
+
+    <p><b>Date:</b>
+      {{ selectedTask?.createdAt | date:'dd/MM/yyyy, hh:mm:ss a' }}
+    </p>
+  </div>
+
+</div>

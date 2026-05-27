@@ -1,0 +1,47 @@
+<div class="form-container">
+
+  <h2>Apply Leave</h2>
+
+  <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()">
+
+    <!-- Leave Type -->
+    <div class="form-group">
+      <label>Leave Type *</label>
+      <input type="text" formControlName="leaveType" placeholder="e.g. Sick, Casual" />
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label>Description *</label>
+      <textarea formControlName="description" placeholder="Reason for leave"></textarea>
+    </div>
+
+    <!-- From Date -->
+    <div class="form-group">
+      <label>From Date *</label>
+      <input type="date" formControlName="fromDate" />
+    </div>
+
+    <!-- To Date -->
+    <div class="form-group">
+      <label>To Date *</label>
+      <input type="date" formControlName="toDate" />
+    </div>
+
+    <!-- File Upload -->
+    <div class="form-group">
+      <label>Upload Document (Optional)</label>
+      <input type="file" (change)="onFileChange($event)" />
+            <p *ngIf="selectedFile">Selected: {{ selectedFile.name }}</p>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-group">
+      <button type="submit">Submit</button>
+      <button type="button" class="reset" (click)="resetForm()">Reset</button>
+    </div>
+
+  </form>
+
+</div>

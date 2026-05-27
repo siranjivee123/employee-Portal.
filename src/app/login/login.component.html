@@ -1,0 +1,91 @@
+<div class="login-container">
+  <mat-card class="login-card">
+
+    <h1 class="title">Employer Portal</h1>
+
+    <!-- Loader -->
+    <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      (keydown.enter)="onSubmit()">
+
+      <!-- Email -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" />
+
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+          Email is required
+        </mat-error>
+
+        <mat-error *ngIf="loginForm.get('email')?.hasError('minlength')">
+         Enter a Valid Mail
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Password -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+
+        <input
+          matInput
+          [type]="hidePassword ? 'password' : 'text'"
+          formControlName="password"
+        />
+
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="hidePassword = !hidePassword"
+        >
+          <mat-icon>
+            {{ hidePassword ? 'visibility_off' : 'visibility' }}
+          </mat-icon>
+        </button>
+
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+          Password is required
+        </mat-error>
+
+        <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
+          Minimum 6 characters required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- CAPTCHA -->
+       <div class="captcha-container">
+  <div class="g-recaptcha" data-sitekey="PASTE_YOUR_REAL_SITE_KEY"></div>
+</div>
+
+<mat-error *ngIf="captchaError">
+  Please complete captcha
+</mat-error>
+      <!-- API Error -->
+     <div class="error-message" *ngIf="loginForm.hasError('invalid') && loginForm.touched">
+  Invalid credentials
+</div>
+
+      <!-- Login Button -->
+      <button
+        mat-raised-button
+        color="primary"
+        class="login-btn full-width"
+        type="submit"
+        [disabled]="isLoading"
+      >
+        <span *ngIf="!isLoading">Login</span>
+        <span *ngIf="isLoading">Logging in...</span>
+      </button>
+
+      <!-- Forgot Password -->
+      <div class="forgot-password">
+        <a routerLink="/forgot-password">Forgot Password?</a>
+      </div>
+
+    </form>
+
+  </mat-card>
+</div>
