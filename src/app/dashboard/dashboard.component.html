@@ -50,12 +50,12 @@
   <div *ngIf="activeView === 'dashboard'">
     <div class="cards">
 
-      <div class="card">
+      <div class="card"  *ngIf="role !== 'employee'">
         <p><b>Total Employees</b></p>
 <h3>{{ totalEmployees }}</h3>
       </div>
 
-      <div class="card">
+      <div class="card"  *ngIf="role !== 'employee'">
         <p><b>In Progress Projects</b></p>
       <h3>{{ inprogressProjects }}</h3>
 
@@ -73,7 +73,7 @@
 
       </div>
    
-      <div class="card">
+      <div class="card"  *ngIf="role !== 'employee'">
   <p><b>Pending Projects</b><p></p>
   <h3>{{ pendingProjects }}</h3>
 </div>
@@ -85,7 +85,7 @@
 
    
 
-      <div class="card">
+      <div class="card"  *ngIf="role !== 'employee'">
         <p><b>Project Completed</b></p>
       <h3>{{ completedProjects }}</h3>
       </div>

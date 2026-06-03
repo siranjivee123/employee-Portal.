@@ -37,8 +37,10 @@ export class AddTaskComponent implements OnInit {
   taskForm!: FormGroup;
   editId: string | null = null;
 
-  projectList: any[] = [];
+  projects: any[] = [];
 assignedByList: any[] = [];
+
+filteredProjects: any[] = [];
   constructor(
     private fb: FormBuilder,
     public router: Router,
@@ -55,12 +57,14 @@ assignedByList: any[] = [];
       project: ['', Validators.required],
       shift: ['', Validators.required],
       assignedBy: ['', Validators.required],
+      assignedTo: ['', Validators.required],
+
       effort: ['', Validators.required],
       status: ['', Validators.required]
     });
 
     // LOAD PROJECTS FROM API
-    this.loadProjects();
+    this.loadProjects(); 
     this.loadEmployees();   
 
     // EDIT MODE
@@ -70,6 +74,62 @@ assignedByList: any[] = [];
       this.getTaskById(this.editId);
     }
   }
+  loadProjects() {
+  this.http.get<any>('http://localhost:5000/api/projects/all')
+    .subscribe({
+      next: (res) => {
+        this.projects = res?.projects || res?.data || res || [];
+        this.filteredProjects = this.projects; // initially show all
+      },
+      error: () => {
+        Swal.fire('Error', 'Failed to load projects', 'error');
+      }
+    });
+}
+
+
+
+
+  
+/*onEmployeeChange(empId: string) {
+  this.http.get<any[]>(`http://localhost:5000/api/projects/employee/${empId}`)
+    .subscribe({
+      next: (projects) => {
+        this.filteredProjects = projects || [];
+
+        // reset selected project
+        this.taskForm.patchValue({ project: '' });
+      },
+      error: () => {
+        this.filteredProjects = [];
+      }
+    });
+}*/
+  
+ onEmployeeChange(empId: string) {
+
+  const employee = this.assignedByList.find(e => e._id === empId);
+
+  if (!employee || !employee.projects) {
+    this.filteredProjects = this.projects;
+    return;
+  }
+
+  const empProjectIds = employee.projects.map((p: any) =>
+    typeof p === 'string' ? p : p._id
+  );
+
+  this.filteredProjects = this.projects.filter(p =>
+    empProjectIds.includes(p._id)
+  );
+
+  // reset selected project if not valid
+  const selected = this.taskForm.value.project;
+  if (!empProjectIds.includes(selected)) {
+    this.taskForm.patchValue({ project: '' });
+  }
+}
+ 
 loadEmployees() {
   this.http.get<any>('http://localhost:5000/api/employee/all')
     .subscribe({
@@ -83,18 +143,7 @@ loadEmployees() {
       }
     });
 }
-  //  GET PROJECT LIST 
-  loadProjects() {
-    this.http.get<any>('http://localhost:5000/api/projects/all')
-      .subscribe({
-        next: (res) => {
-          this.projectList = res?.projects || res?.data || res || [];
-        },
-        error: () => {
-          Swal.fire('Error', 'Failed to load projects', 'error');
-        }
-      });
-  }
+ 
 
   // GET TASK BY ID
   getTaskById(id: string) {
@@ -107,6 +156,7 @@ loadEmployees() {
           project: res.project?._id || res.project,
           shift: res.shift,
           assignedBy: res.assignedBy?._id || res.assignedBy,
+           assignedTo: res.assignedTo?._id || res.assignedTo,
           effort: res.effort
         });
       },
@@ -124,11 +174,22 @@ loadEmployees() {
     return;
   }
 
-  const data = this.taskForm.value; 
+const formValue = this.taskForm.value;
 
+const data = {
+  ticket: formValue.ticket,
+  description: formValue.description,
+  project: formValue.project,        
+  shift: formValue.shift,
+  assignedBy: formValue.assignedBy,
+  assignedTo: formValue.assignedTo,    
+  effort: formValue.effort,
+  status: formValue.status
+};
   // UPDATE
   if (this.editId) {
-    this.http.put(`http://localhost:5000/api/tasks/update/${this.editId}`, data)
+    const role = (localStorage.getItem('role') || '').toLowerCase();
+    this.http.put(`http://localhost:5000/api/tasks/update/${this.editId}?role=${role}`, data)
       .subscribe({
         next: () => this.showSuccess('Task Updated!'),
         error: () => this.showError()
@@ -138,7 +199,8 @@ loadEmployees() {
   
   // ADD
   else {
-    this.http.post(`http://localhost:5000/api/tasks/add`, data)
+    const role = (localStorage.getItem('role') || '').toLowerCase();
+    this.http.post(`http://localhost:5000/api/tasks/add?role=${role}`, data)
       .subscribe({
         next: () => this.showSuccess('Task Added!'),
         error: () => this.showError()

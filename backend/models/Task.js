@@ -14,15 +14,17 @@ const taskSchema = new mongoose.Schema({
     ref: "Project",
     required: true
   },
+
+  assignedTo: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Employee"
+},
 assignedBy: {
   type: mongoose.Schema.Types.ObjectId,
   ref: "Employee"
 },
   
-assignedTo: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "Employee"
-},
+
   
   shift: {
     type: String,

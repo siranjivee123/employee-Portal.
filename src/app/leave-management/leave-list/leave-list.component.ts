@@ -73,12 +73,16 @@ onPageChange(event: any) {
         next: (res) => {
 
           let data = res.data || [];
+            const empId = localStorage.getItem('employeeId');
 
-          if (this.role === 'employee') {
-            this.allLeaves = data.filter((l: any) =>
-              l?.employeeName === this.userName
-            );
-          } else {
+          if (this.role === 'employee'|| this.role === 'manager') {
+
+  this.allLeaves = data.filter((l: any) =>
+    l?.employeeId?._id === empId
+  );
+}
+
+           else {
             this.allLeaves = data;
           }
 

@@ -8,6 +8,7 @@
       <!--  STEP 1-->
       <mat-step [stepControl]="basicForm">
         <form [formGroup]="basicForm">
+           <ng-template matStepLabel>Basic Details</ng-template>
 
           <!-- NAME -->
           <div class="field">
@@ -168,13 +169,14 @@
       <!-- STEP 2  -->
       <mat-step [stepControl]="techForm">
         <form [formGroup]="techForm">
+           <ng-template matStepLabel>Role & Project Details</ng-template>
 
           <!-- ROLE -->
          <mat-form-field appearance="outline" class="full-width small-field">
   <mat-label>Select Role</mat-label>
   <mat-select formControlName="role">
-    <mat-option *ngFor="let r of roles" [value]="r">
-      {{ r }}
+    <mat-option *ngFor="let r of roles" [value]="r.value">
+      {{ r.label }}
     </mat-option>
   </mat-select>
 </mat-form-field>
@@ -188,12 +190,12 @@
   </mat-select>
 </mat-form-field>
 
-          <!-- PROJECTS
+          <!-- PROJECTS-->
           <div class="field">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Projects</mat-label>
               <mat-select formControlName="projects" multiple>
-                <mat-option *ngFor="let p of projectsList" [value]="p._id">
+                <mat-option *ngFor="let p of projects" [value]="p._id">
                   {{ p.name}}
                 </mat-option>
               </mat-select>

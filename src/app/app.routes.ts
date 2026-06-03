@@ -89,6 +89,7 @@ export const routes: Routes = [
   canActivate: [authGuard],
   data: { roles: ['admin', 'manager', 'employee'] }
 },
+
   // fallback
   { path: '**', redirectTo: 'login' }
 ];

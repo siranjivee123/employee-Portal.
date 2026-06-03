@@ -7,7 +7,7 @@ import { EmployeeListComponent } from '../employee-list/employee-list';
 import { ProjectsComponent } from '../projects/projects';
 import { TaskListComponent } from '../tasks/task-list/task-list.component';
 import { LeaveListComponent } from '../leave-management/leave-list/leave-list.component';
-import { ViewChild, ElementRef } from '@angular/core';
+import { ViewChild, ElementRef,AfterViewInit} from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
@@ -25,13 +25,13 @@ Chart.register(...registerables);
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
 
   isSidebarOpen = false;
   activeView: string = 'dashboard';
   role: string = '';
   menuItems: any[] = [];
-
+employeeProjectNames: string[] = [];
   //DASHBOARD VALUES
   totalEmployees = 0;
   inprogressProjects = 0;
@@ -41,7 +41,6 @@ export class DashboardComponent implements OnInit {
   leaveRequests = 0;
   pendingProjects = 0;
   completedProjects = 0;
-
 @ViewChild('taskChart') taskChartRef!: ElementRef;
 @ViewChild('projectChart') projectChartRef!: ElementRef;
 @ViewChild('leaveChart') leaveChartRef!: ElementRef;
@@ -61,12 +60,12 @@ export class DashboardComponent implements OnInit {
     { label: 'Employees', 
       icon: 'people', 
       view: 'employees',
-       roles: ['admin'] 
+       roles: ['admin','manager'] 
       },
     { label: 'Projects', 
       icon: 'settings',
        view: 'projects', 
-       roles: ['admin']
+       roles: ['admin','manager']
        },
     { label: 'Tasks', 
       icon: 'assignment',
@@ -97,6 +96,7 @@ normalizeData(data: any) {
       0
   };
 }
+
   ngOnInit() {
 
     // ROLE
@@ -107,14 +107,30 @@ normalizeData(data: any) {
       item.roles.includes(this.role)
     );
 
+     //  LOAD EMPLOYEE PROJECTS
+ 
+  
+
+
     // VIEW CONTROL
     this.route.queryParams.subscribe(params => {
       this.activeView = params['view'] || 'dashboard';
-    });
-this.loadDashboardData();
+    
+  
+     if (this.activeView === 'dashboard') {
+    this.loadDashboardData();
+  }
+});
+
   }
 
+ ngAfterViewInit() {
+
   
+     if (this.activeView === 'dashboard') {}
+  
+}
+
   // LOAD DATA FROM BACKEND
   loadDashboardData() {
   this.dashboardService.getDashboardData().subscribe({
@@ -145,10 +161,16 @@ this.loadDashboardData();
 
       //  
       setTimeout(() => {
+         if (
+    this.taskChartRef?.nativeElement &&
+    this.projectChartRef?.nativeElement &&
+    this.leaveChartRef?.nativeElement
+         ) {
         this.createTaskChart(res.tasks || {});
         this.createProjectChart(res.projects || {});
         this.createLeaveChart(res.leaves || {});
-      }, 300);
+        }
+      });
 
     },
     error: (err) => {
@@ -160,28 +182,25 @@ this.loadDashboardData();
   // CHARTS
 
   createTaskChart(tasks: any) {
-    if (this.taskChart) this.taskChart.destroy();
-    
+  if (!this.taskChartRef?.nativeElement) return;
 
-    this.taskChart = new Chart(
-      this.taskChartRef.nativeElement,
-      {
-      type: 'pie',
-      data: {
-        labels: ['Completed', 'Pending', 'In Progress'],
-        datasets: [{
-          data: [
-            tasks?.completed || 0,
-            tasks?.pending || 0,
-            tasks?.inProgress || 0
-          ],
-          backgroundColor: ['#4CAF50', '#FF9800', '#2196F3']
-        }]
-      }
-    
-    });
-  }
+  if (this.taskChart) this.taskChart.destroy();
 
+  this.taskChart = new Chart(this.taskChartRef.nativeElement, {
+    type: 'pie',
+    data: {
+      labels: ['Completed', 'Pending', 'In Progress'],
+      datasets: [{
+        data: [
+          tasks?.completed || 0,
+          tasks?.pending || 0,
+          tasks?.inProgress || 0
+        ],
+        backgroundColor: ['#4CAF50', '#FF9800', '#2196F3']
+      }]
+    }
+  });
+}
 
   createProjectChart(projects: any) {
     if (this.projectChart) this.projectChart.destroy();

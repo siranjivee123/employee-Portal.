@@ -30,10 +30,23 @@ tempPassword: String,
   profileImage: String,
    role: {
     type: String,
-    enum: ['employee', 'manager', 'admin'],
+    enum: ['employee', 'manager'],
     default: 'employee',
     required: true
   },
+  projects: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Project"
+  }
+],
+
+tasks: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Task"
+  }
+],
 
 
   

@@ -63,7 +63,7 @@ export class AddProjectComponent implements OnInit {
   }
 
   //  LOAD EMPLOYEES
-  loadEmployees() {
+  /*loadEmployees() {
     this.http.get<any>('http://localhost:5000/api/employee/all')
       .subscribe({
         next: (res: any) => {
@@ -86,8 +86,58 @@ export class AddProjectComponent implements OnInit {
           Swal.fire('Error', 'Failed to load employees', 'error');
         }
       });
-  }
+  }*/
+/*loadEmployees() {
+  this.http.get<any>('http://localhost:5000/api/employee/all')
+    .subscribe({
+      next: (res: any) => {
 
+        const all = res.employees || res || [];
+
+        // ONLY managers
+        this.managersList = all.filter((e: any) =>
+          e.role === 'Manager'
+        );
+
+        // ONLY employees
+        this.employeeList = all.filter((e: any) =>
+          e.role === 'Employee'
+        );
+
+      },
+      error: () => {
+        Swal.fire('Error', 'Failed to load employees', 'error');
+      }
+    });
+}*/
+
+loadEmployees() {
+  this.http.get<any>('http://localhost:5000/api/employee/all')
+    .subscribe({
+      next: (res: any) => {
+        console.log('API RESPONSE:', res);
+
+        const all = res.employees || res.data || res || [];
+        console.log('ALL USERS:', all);
+
+        // Normalize role to lowercase
+        this.managersList = all.filter((e: any) =>
+          (e.role || '').toLowerCase() === 'manager'
+        );
+
+        this.employeeList = all.filter((e: any) =>
+          (e.role || '').toLowerCase() === 'employee'
+        );
+
+        console.log('MANAGERS:', this.managersList);
+        console.log('EMPLOYEES:', this.employeeList);
+      },
+      error: (err) => {
+        console.error('ERROR:', err);
+        Swal.fire('Error', 'Failed to load employees', 'error');
+      }
+    });
+}
   //  GET PROJECT
   getProjectById(id: string) {
     this.http.get<any>(`http://localhost:5000/api/projects/${id}`)
@@ -118,13 +168,15 @@ export class AddProjectComponent implements OnInit {
     const data = this.projectForm.value;
 
     if (this.editId) {
-      this.http.put(`http://localhost:5000/api/projects/update/${this.editId}`, data)
+      const role = localStorage.getItem('role');
+      this.http.put(`http://localhost:5000/api/projects/update/${this.editId}?role=${role}`, data)
         .subscribe({
           next: () => this.showSuccess('Project Updated!'),
           error: () => this.showError()
         });
     } else {
-      this.http.post(`http://localhost:5000/api/projects/add`, data)
+      const role = localStorage.getItem('role');
+      this.http.post(`http://localhost:5000/api/projects/add?role=${role}`, data)
         .subscribe({
           next: () => this.showSuccess('Project Added!'),
           error: () => this.showError()

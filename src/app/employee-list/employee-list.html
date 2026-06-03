@@ -1,16 +1,14 @@
-<!-- Header -->
 <div class="header"></div>
 
-<!-- Top actions-->
 <div class="top-actions">
-  <button class="add-btn" routerLink="/add-employee">
+  <button class="add-btn" *ngIf="role === 'admin'" routerLink="/add-employee">
     Add New Employee
   </button>
 
   <div class="filters">
     <input
       type="text"
-      placeholder="Search by email"
+      placeholder="Search by email or name"
       [(ngModel)]="searchText"
       (input)="applyFilter()" />
 
@@ -35,24 +33,19 @@
   </div>
 </div>
 
-<!--  CARD UI -->
-  <div class="card-scroll">
-
-<div class="card-container">
-
-  <div class="employee-card" *ngFor="let emp of paginatedData">
-
-  <div class="profile-img"
+<div class="card-scroll">
+  <div class="card-container">
+    <div class="employee-card" *ngFor="let emp of paginatedData">
+      <!---- IMAGE + EDIT -->
+         <div class="profile-img"
      (mouseenter)="hoveredEmp = emp._id"
      (mouseleave)="hoveredEmp = null">
 
-  <img
-    [src]="emp.profileImage
-      ? 'http://localhost:5000' + emp.profileImage
-      : 'assets/default-user.png'"
-    class="avatar"
-    alt="Profile Image"/>
-
+        <img
+          [src]="emp.profileImage ? 'http://localhost:5000' + emp.profileImage : 'assets/default-user.png'"
+          class="avatar"
+          alt="Profile Image" />
+      
   <!--  EDIT -->
   <div class="img-overlay" *ngIf="hoveredEmp === emp._id">
 
@@ -68,95 +61,60 @@
     </label>
 
   </div>
+      </div>
 
-</div>
-    <!-- Details -->
-    <div class="card-details">
-      <p><b>Name:</b> {{ emp.name }}</p>
-      <p><b>Email:</b> {{ emp.email }}</p>
+      <div class="card-details">
+        <p><b>Name:</b> {{ emp.name }}</p>
+        <p><b>Email:</b> {{ emp.email }}</p>
+        <p><b>Projects:</b> {{ getProjectNames(emp) }}</p>
+        <p><b>Tasks:</b> {{ getTaskTickets(emp) }}</p>
+        <p><b>Date:</b> {{ emp.createdAt | date:'dd/MM/yyyy, hh:mm:ss a' }}</p>
+      </div>
 
-      <p><b>Projects:</b>
- {{ getProjectNames(emp) }}
-      </p>
+      <div class="card-actions">
+        <button mat-icon-button color="primary" (click)="viewEmployee(emp)">
+          <mat-icon>visibility</mat-icon>
+        </button>
 
-      <p><b>Tasks:</b> 
- {{ getTaskTickets(emp) }}
-      </p>
+        <button
+          mat-icon-button
+          color="accent"
+          *ngIf="role === 'admin'"
+          (click)="editEmployee(emp)">
+          <mat-icon>edit</mat-icon>
+        </button>
 
-      <!-- DATE -->
-      <p><b>Date:</b>
-        {{ emp.createdAt | date:'dd/MM/yyyy, hh:mm:ss a' }}
-      </p>
+        <button
+          mat-icon-button
+          color="warn"
+          *ngIf="role === 'admin'"
+          (click)="deleteEmployee(emp._id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
     </div>
-
-    <!-- Actions -->
-    <div class="card-actions">
-
-  <!-- VIEW -->
-  <button mat-icon-button color="primary" (click)="viewEmployee(emp)">
-    <mat-icon>visibility</mat-icon>
-  </button>
-
-  <!-- EDIT -->
-  <button
-    mat-icon-button
-    color="accent"
-    *ngIf="role === 'admin'"
-    (click)="editEmployee(emp)">
-    <mat-icon>edit</mat-icon>
-  </button>
-
-  <!-- DELETE -->
-  <button
-    mat-icon-button
-    color="warn"
-    *ngIf="role === 'admin'"
-    (click)="deleteEmployee(emp._id)">
-    <mat-icon>delete</mat-icon>
-  </button>
-
-</div>
-    
-
   </div>
 
-</div>
-<mat-paginator
-  [pageSize]="10"
-  [pageSizeOptions]="[5, 10, 25, 50]"
-  showFirstLastButtons>
-</mat-paginator>
-<!-- POPUP -->
+  <mat-paginator
+    [pageSize]="10"
+    [pageSizeOptions]="[5, 10, 25, 50]"
+    showFirstLastButtons>
+  </mat-paginator>
+
   <div class="popup-overlay" *ngIf="showPopup">
+    <div class="popup">
+      <div class="popup-header">
+        <h2>Employee Details</h2>
+        <button class="close-btn" (click)="closePopup()">X</button>
+      </div>
 
-  <div class="popup">
-
-    <!-- HEADER ---->
-    <div class="popup-header">
-      <h2>Employee Details</h2>
-      <button class="close-btn" (click)="closePopup()">X</button>
+      <div class="popup-body">
+        <p><b>Employee Name:</b> {{ selectedEmployee?.name || 'N/A' }}</p>
+        <p><b>Email:</b> {{ selectedEmployee?.email }}</p>
+        <p><b>Projects:</b> {{ getProjectNames(selectedEmployee) }}</p>
+        <p><b>Tasks:</b> {{ getTaskTickets(selectedEmployee) }}</p>
+        <p><b>Date:</b> {{ selectedEmployee?.createdAt | date:'dd/MM/yyyy, hh:mm:ss a' }}</p>
+      </div>
     </div>
-
-    <!-- CONTENT -->
-    <p><b>Name:</b> {{ selectedEmployee?.name }}</p>
-    <p><b>Email:</b> {{ selectedEmployee?.email }}</p>
-
-    <p><b>Projects:</b>
-      {{ getProjectNames(selectedEmployee) }}
-    </p>
-
-    <p><b>Tasks:</b>
-      {{ getTaskTickets(selectedEmployee) }}
-    </p>
-
-    <p><b>Date:</b>
-      {{ selectedEmployee?.createdAt | date:'dd/MM/yyyy, hh:mm:ss a' }}
-    </p>
-
   </div>
-
 </div>
-
-</div>
-
-

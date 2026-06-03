@@ -26,7 +26,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class ForgotPasswordComponent {
 
-  userId = '';
+  email = '';
 
   //  OTP 
   otpArray = new FormArray(
@@ -43,14 +43,13 @@ export class ForgotPasswordComponent {
 
   //  SEND OTP 
   sendOtp(stepper: any) {
-
-    if (!this.userId) {
-      alert('Enter Employee ID');
+    if (!this.email) {
+      alert('Enter Email');
       return;
     }
 
     this.http.post('http://localhost:5000/api/auth/send-otp', {
-      userId: this.userId
+      email: this.email
     }).subscribe({
       next: () => {
 
@@ -101,7 +100,7 @@ export class ForgotPasswordComponent {
     }
 
     this.http.post('http://localhost:5000/api/auth/verify-otp', {
-      userId: this.userId,
+      email: this.email,
       otp
     }).subscribe({
       next: () => {
@@ -121,7 +120,7 @@ export class ForgotPasswordComponent {
   }
 
   this.http.post('http://localhost:5000/api/auth/reset-password', {
-    userId: this.userId.trim(),
+    email: this.email.trim(),
     newPassword: this.newPassword
   }).subscribe({
     next: (res: any) => {

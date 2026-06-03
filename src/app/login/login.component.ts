@@ -115,6 +115,7 @@ export class LoginComponent implements AfterViewInit {
 const userName = res.userName || '';
   localStorage.setItem('employeeId', res.employeeId);
 localStorage.setItem('userName', userName);
+localStorage.setItem('email', res.user?.email || '');
 
 
         // Save token + role

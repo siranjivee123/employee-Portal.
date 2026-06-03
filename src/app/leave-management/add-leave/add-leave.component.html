@@ -7,7 +7,12 @@
     <!-- Leave Type -->
     <div class="form-group">
       <label>Leave Type *</label>
-      <input type="text" formControlName="leaveType" placeholder="e.g. Sick, Casual" />
+      <select formControlName="leaveType">
+  <option value=""> Select Leave Type </option>
+  <option value="Sick">Sick Leave</option>
+  <option value="Casual">Casual Leave</option>
+  <option value="Emergency">Emergency Leave</option>
+</select>
     </div>
 
     <!-- Description -->

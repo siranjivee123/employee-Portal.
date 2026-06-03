@@ -55,14 +55,34 @@ export class TaskListComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  ngOnInit() {
+  /*ngOnInit() {
     this.loadTasks();
 
     // safer filter setup
     this.dataSource.filterPredicate = (data: any, filter: string) => {
       return (data.ticket || '').toLowerCase().includes(filter);
     };
+  }*/
+role: string = '';
+userId: string = '';
+ngOnInit() {
+
+  this.role = (localStorage.getItem('role') || '').toLowerCase();
+  this.userId = localStorage.getItem('employeeId') || '';
+
+   if (!this.role || !this.userId) {
+    Swal.fire('Error', 'Session expired. Please login again.');
+    this.router.navigate(['/login']);
+    return;
   }
+
+  this.loadTasks();
+
+  this.dataSource.filterPredicate = (data: any, filter: string) => {
+    return (data.ticket || '').toLowerCase().includes(filter);
+  };
+}
+
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -72,8 +92,9 @@ export class TaskListComponent implements OnInit, AfterViewInit {
   // LOAD TASKS 
   // 
   loadTasks() {
-    this.http.get<any>('http://localhost:5000/api/tasks/all')
-      .subscribe({
+this.http.get<any>(
+  `http://localhost:5000/api/tasks/all?role=${this.role}&userId=${this.userId}`
+)      .subscribe({
         next: (res) => {
 
           console.log('TASK API RESPONSE:', res);
@@ -115,7 +136,7 @@ export class TaskListComponent implements OnInit, AfterViewInit {
   }
 
   
-  // FILTER (SAFE + CLEAN)
+  // FILTER 
   
   applyFilter() {
 
@@ -133,15 +154,21 @@ export class TaskListComponent implements OnInit, AfterViewInit {
       );
     }
 
-    if (this.selectedProject) {
-      data = data.filter(t =>
-        (t.project || '')
-          .toString()
-          .toLowerCase()
-          .includes(this.selectedProject.toLowerCase())
-      );
-    }
-
+    // if (this.selectedProject) {
+    //   data = data.filter(t =>
+    //     (t.project || '')
+    //       .toString()
+    //       .toLowerCase()
+    //       .includes(this.selectedProject.toLowerCase())
+    //   );
+    // }
+if (this.selectedProject) {
+  data = data.filter(t =>
+    (t.project?.name || '')
+      .toLowerCase()
+      .includes(this.selectedProject.toLowerCase())
+  );
+}
     switch (this.sortOption) {
       case 'ticket-asc':
         data.sort((a, b) =>
@@ -154,17 +181,28 @@ export class TaskListComponent implements OnInit, AfterViewInit {
         );
         break;
 
-      case 'project-asc':
-        data.sort((a, b) =>
-          (a.project || '').toString().localeCompare((b.project || '').toString())
-        );
-        break;
+      // case 'project-asc':
+      //   data.sort((a, b) =>
+      //     (a.project || '').toString().localeCompare((b.project || '').toString())
+      //   );
+      //   break;
 
-      case 'project-desc':
-        data.sort((a, b) =>
-          (b.project || '').toString().localeCompare((a.project || '').toString())
-        );
-        break;
+      // case 'project-desc':
+      //   data.sort((a, b) =>
+      //     (b.project || '').toString().localeCompare((a.project || '').toString())
+      //   );
+      //   break;
+      case 'project-asc':
+  data.sort((a, b) =>
+    (a.project?.name || '').localeCompare(b.project?.name || '')
+  );
+  break;
+
+case 'project-desc':
+  data.sort((a, b) =>
+    (b.project?.name || '').localeCompare(a.project?.name || '')
+  );
+  break;
     }
 
     this.dataSource.data = data;
@@ -184,6 +222,13 @@ export class TaskListComponent implements OnInit, AfterViewInit {
 
   // EDIT
   editTask(t: any) {
+    const role = localStorage.getItem('role');
+
+    if (role !== 'admin') {
+      Swal.fire('Access Denied', 'Not allowed', 'error');
+      return;
+    }
+
     this.router.navigate(['/add-task'], {
       queryParams: { id: t._id }
     });
@@ -191,7 +236,9 @@ export class TaskListComponent implements OnInit, AfterViewInit {
 
   // DELETE
   deleteTask(id: string) {
+      const role = (localStorage.getItem('role') || '').toLowerCase();
 
+   
     Swal.fire({
       title: 'Are you sure?',
       text: 'This task will be deleted!',
@@ -203,7 +250,7 @@ export class TaskListComponent implements OnInit, AfterViewInit {
 
       if (result.isConfirmed) {
 
-        this.http.delete(`http://localhost:5000/api/tasks/delete/${id}`)
+        this.http.delete(`http://localhost:5000/api/tasks/delete/${id}?role=${role}`)
           .subscribe({
             next: () => {
               this.loadTasks();

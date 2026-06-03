@@ -23,24 +23,40 @@
         </mat-error>
       </mat-form-field>
 
-  <!-- Project -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Project</mat-label>
-        <mat-select formControlName="project">
 
-          <mat-option value=""> Select Project </mat-option>
-          
-          <mat-option *ngFor="let p of projectList" [value]="p._id">
-            {{ p.name}}
-          </mat-option>
+<!-- Assigned To -->
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>Assigned To</mat-label>
 
-        </mat-select>
+  <mat-select formControlName="assignedTo"
+              (selectionChange)="onEmployeeChange($event.value)">
 
-        <mat-error *ngIf="taskForm.get('project')?.touched && taskForm.get('project')?.invalid">
-          Please select Project
-        </mat-error>
-      </mat-form-field>
+    <mat-option *ngFor="let emp of assignedByList" [value]="emp._id">
+      {{ emp.name }}
+    </mat-option>
 
+  </mat-select>
+
+  <mat-error *ngIf="taskForm.get('assignedTo')?.invalid">
+    Please select employee
+  </mat-error>
+</mat-form-field>
+
+ <mat-form-field appearance="outline" class="full-width">
+  <mat-label>Project</mat-label>
+
+  <mat-select formControlName="project">
+
+    <mat-option *ngFor="let p of filteredProjects" [value]="p._id">
+      {{ p.name }}
+    </mat-option>
+
+  </mat-select>
+
+  <mat-error *ngIf="taskForm.get('project')?.invalid">
+    Please select project
+  </mat-error>
+</mat-form-field>
   <!-- Shift -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Shift</mat-label>
@@ -54,7 +70,7 @@
         </mat-error>
       </mat-form-field>
 
-   <!-- Assigned -->
+   <!-- Assigned---->
      <mat-form-field appearance="outline" class="full-width">
   <mat-label>Assigned By</mat-label>
 
@@ -71,6 +87,27 @@
   </mat-error>
 
 </mat-form-field>
+
+
+
+
+<!-- Assigned To 
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>Assigned To</mat-label>
+
+  <mat-select formControlName="assignedTo"
+              (selectionChange)="onEmployeeChange($event.value)">
+
+    <mat-option *ngFor="let emp of assignedByList" [value]="emp._id">
+      {{ emp.name }}
+    </mat-option>
+
+  </mat-select>
+
+  <mat-error *ngIf="taskForm.get('assignedTo')?.invalid">
+    Please select employee
+  </mat-error>
+</mat-form-field>--->
   <!-- Effort -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Effort (Hours)</mat-label>
@@ -83,9 +120,9 @@
        <mat-form-field appearance="outline" class="full-width">
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
-          <mat-option value="In progress">In progress</mat-option>
-          <mat-option value="Completed">completed</mat-option>
-          <mat-option value="pending">pending</mat-option>
+         <mat-option value="Pending">Pending</mat-option>
+<mat-option value="In Progress">In Progress</mat-option>
+<mat-option value="Completed">Completed</mat-option>
         </mat-select>
 
         <mat-error *ngIf="taskForm.get('status')?.invalid">
@@ -104,11 +141,15 @@
 
         <button mat-raised-button class="cancel-btn"
                 type="button"
-                (click)="router.navigate(['tasks'])"> Cancel </button>
-
+                (click)="router.navigate(['/dashboard'], { queryParams: { view: 'tasks' } })">
+          Cancel
+        </button>
+ 
       </div>
 
     </form>
 
   </mat-card>
 </div>
+
+

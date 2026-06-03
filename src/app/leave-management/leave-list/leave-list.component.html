@@ -97,8 +97,8 @@
     <div class="popup">
 
       <h2>Leave Details</h2>
+      <p><b>Employee:</b> {{ selectedLeave?.employeeId?.name }}</p>
 
-      <p><b>Employee:</b> {{ selectedLeave?.employeeName }}</p>
       <p><b>Type:</b> {{ selectedLeave?.leaveType }}</p>
       <p><b>From:</b> {{ selectedLeave?.fromDate | date }}</p>
       <p><b>To:</b> {{ selectedLeave?.toDate | date }}</p>

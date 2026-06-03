@@ -3,6 +3,7 @@ const Task = require("../models/Task");
 const Project = require("../models/Project");
 const Leave = require("../models/Leave");
 const Employee = require("../models/Employee");
+
 //GET DATA
 
 exports.getDashboardData = async (req, res) => {
@@ -80,8 +81,15 @@ exports.getDashboardData = async (req, res) => {
 
     const totalEmployees = await Employee.countDocuments();
 
-    // RESPONSE
+  
+// RESPONSE (ROLE BASED)
 
+if (role === "employee") {
+  return res.json({
+    tasks: taskStats,
+    leaves: leaveStats
+  });
+}
     res.json({
       tasks: taskStats,
       projects: projectStats,

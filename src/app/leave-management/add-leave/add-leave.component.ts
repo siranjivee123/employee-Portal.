@@ -87,7 +87,10 @@ loadEmployees() {
         next: () => {
           alert('Leave applied successfully');
           this.resetForm();
-          this.router.navigate(['/leave']);
+          this.router.navigate(['/dashboard'], {
+              queryParams: { view: 'leave' }
+            });
+
         },
        error: (err) => {
   console.log('ERROR RESPONSE:', err);

@@ -7,16 +7,20 @@ const {
   getTasks,
   getTaskById,
   updateTask,
-  deleteTask
-} = require("../controllers/taskController");
+  deleteTask,
+   getTasksByEmployee,
+   getTasksByEmployeeProjects
+
+  } = require("../controllers/taskController");
 
 // CRUD
 router.post("/add", addTask);
-router.get("/all", getTasks);
-router.get("/:id", getTaskById);
+
 router.put("/update/:id", updateTask);
 router.delete("/delete/:id", deleteTask);
 router.get("/dashboard/tasks/:userId", getTaskAnalytics);
-
-
+router.get("/employee/:empId", getTasksByEmployee);
+router.get("/employee-project-tasks/:empId", getTasksByEmployeeProjects);
+router.get("/all", getTasks);
+router.get("/:id", getTaskById);
 module.exports = router;

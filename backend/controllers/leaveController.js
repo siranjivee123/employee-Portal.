@@ -48,10 +48,11 @@ const getLeaves = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    const leaves = await Leave.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
+   const leaves = await Leave.find(filter)
+  .populate("employeeId", "name email employeeId role")
+  .sort({ createdAt: -1 })
+  .skip(skip)
+  .limit(parseInt(limit));
 
     const total = await Leave.countDocuments(filter);
 

@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +8,7 @@ import Swal from 'sweetalert2';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+
 @Component({
   selector: 'app-employee-list',
   standalone: true,
@@ -26,23 +26,10 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class EmployeeListComponent implements OnInit, AfterViewInit {
 
-  // TABLE 
-  displayedColumns: string[] = [
-    'sno',
-    'profileImage',
-    'id',
-    'name',
-    'projects',
-    'tasks',
-    'email',
-    'date',
-    'actions'
-  ];
-
+  displayedColumns: string[] = ['sno', 'profileImage', 'id', 'name', 'projects', 'tasks', 'email', 'date', 'actions'];
+  
   employees: any[] = [];
   dataSource = new MatTableDataSource<any>([]);
-
-  //  PAGINATION ARRAY
   paginatedData: any[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -53,25 +40,28 @@ export class EmployeeListComponent implements OnInit, AfterViewInit {
   selectedDate = '';
   sortOption = '';
 
-  // ROLE
+  // USER AUTH INFO
   role: string = '';
+  loggedInEmployeeId: string = '';
 
   // POPUP
   showPopup = false;
   selectedEmployee: any = null;
-hoveredEmp: string | null = null;
+  //HOVERED IMAGE:
+  hoveredEmp: string | null = null;
+
   constructor(
     private router: Router,
     private http: HttpClient
   ) {
-    this.getRoleFromToken();
+    this.getUserDetails();
   }
 
-  // INIT
   ngOnInit(): void {
     this.loadEmployees();
   }
-  onImageChange(event: any, emp: any) {
+  // IMAGE UPLOAD:
+onImageChange(event: any, emp: any) {
   const file = event.target.files[0];
   if (!file) return;
 
@@ -105,164 +95,119 @@ hoveredEmp: string | null = null;
     }
   });
 }
-
   ngAfterViewInit() {
     if (this.paginator) {
       this.dataSource.paginator = this.paginator;
-
-    
       this.updatePagedData();
 
-      // ON PAGE CHANGE
       this.paginator.page.subscribe(() => {
         this.updatePagedData();
       });
     }
   }
 
-  // ROLE
-  getRoleFromToken() {
+  getUserDetails() {
     this.role = (localStorage.getItem('role') || '').toLowerCase();
+    this.loggedInEmployeeId = localStorage.getItem('employeeId') || '';
   }
-  //  PAGINATION 
+
   updatePagedData() {
     if (!this.paginator) {
       this.paginatedData = this.dataSource.data;
       return;
     }
-
-    const startIndex =
-      this.paginator.pageIndex * this.paginator.pageSize;
-
+    const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
     const endIndex = startIndex + this.paginator.pageSize;
-
     this.paginatedData = this.dataSource.data.slice(startIndex, endIndex);
-
-    console.log("PAGED DATA:", this.paginatedData);
   }
 
-  // LOAD DATA
   loadEmployees() {
     this.http.get<any>('http://localhost:5000/api/employee/all')
       .subscribe({
         next: (res) => {
-          console.log('API DATA:', res);
+          let data = res.employees || [];
 
-          const data = res.employees || [];
+          //  Filter list  if  user is an employee
+          if (this.role === 'employee') {
+            data = data.filter((emp: any) => emp._id === this.loggedInEmployeeId);
+          }
 
           this.employees = data;
           this.dataSource.data = data;
-
-        
           this.updatePagedData();
-
-          console.log("FINAL ARRAY:", this.dataSource.data);
         },
         error: (err) => {
-          console.error(err);
+          console.error('Failed to load employee directory contextual information:', err);
         }
       });
   }
 
-  // FILTER + SORT
   applyFilter() {
-
     const keyword = this.searchText.trim().toLowerCase();
     const projectKey = this.selectedProject.trim().toLowerCase();
 
     let result = this.employees.filter(emp => {
-
       const name = emp.name?.toLowerCase() || '';
       const email = emp.email?.toLowerCase() || '';
 
-      const matchSearch =
-        !keyword ||
-        name.includes(keyword) ||
-        email.includes(keyword);
+      const matchSearch = !keyword || name.includes(keyword) || email.includes(keyword);
 
       const projects = Array.isArray(emp.projects)
         ? emp.projects
-        : emp.projects
-          ? [emp.projects]
-          : [];
+        : emp.projects ? [emp.projects] : [];
 
-      const matchProject =
-        !projectKey ||
-        projects.some((p: string) =>
-          p.toLowerCase().includes(projectKey)
-        );
+      const matchProject = !projectKey || projects.some((p: any) => {
+        const pName = p?.name || p;
+        return pName.toLowerCase().includes(projectKey);
+      });
 
-      const matchDate =
-        !this.selectedDate ||
+      const matchDate = !this.selectedDate || 
         new Date(emp.createdAt).toISOString().split('T')[0] === this.selectedDate;
 
       return matchSearch && matchProject && matchDate;
     });
 
-    // SORT
+    // SORTING 
     switch (this.sortOption) {
-
       case 'name-asc':
         result.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
         break;
-
       case 'name-desc':
         result.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
         break;
-
       case 'project-asc':
         result.sort((a, b) => {
-          const aProj = Array.isArray(a.projects) ? a.projects[0] : a.projects || '';
-          const bProj = Array.isArray(b.projects) ? b.projects[0] : b.projects || '';
+          const aProj = Array.isArray(a.projects) ? (a.projects[0]?.name || a.projects[0] || '') : (a.projects?.name || a.projects || '');
+          const bProj = Array.isArray(b.projects) ? (b.projects[0]?.name || b.projects[0] || '') : (b.projects?.name || b.projects || '');
           return aProj.localeCompare(bProj);
         });
         break;
-
       case 'project-desc':
         result.sort((a, b) => {
-          const aProj = Array.isArray(a.projects) ? a.projects[0] : a.projects || '';
-          const bProj = Array.isArray(b.projects) ? b.projects[0] : b.projects || '';
+          const aProj = Array.isArray(a.projects) ? (a.projects[0]?.name || a.projects[0] || '') : (a.projects?.name || a.projects || '');
+          const bProj = Array.isArray(b.projects) ? (b.projects[0]?.name || b.projects[0] || '') : (b.projects?.name || b.projects || '');
           return bProj.localeCompare(aProj);
         });
         break;
     }
 
     this.dataSource.data = result;
-
     if (this.paginator) {
       this.paginator.firstPage();
     }
-
-    
     this.updatePagedData();
   }
-  //  FUNCTIONS
-getImageUrl(emp: any) {
-  if (!emp.profileImage) {
-    return 'assets/default-user.png';
+
+  getProjectNames(emp: any): string {
+    if (!emp?.projects || emp.projects.length === 0) return 'NA';
+    return emp.projects.map((p: any) => p?.name || p).filter(Boolean).join(', ');
   }
 
-  return `http://localhost:5000/${emp.profileImage}`;
-}
-getProjectNames(emp: any): string {
-  return (emp.projects || [])
-    .map((p: any) => p?.name)
-    .join(', ');
-}
+  getTaskTickets(emp: any): string {
+    if (!emp?.tasks || emp.tasks.length === 0) return 'NA';
+    return emp.tasks.map((t: any) => `${t.ticket || t.title || 'Task'} (${t.status || 'Pending'})`).join(', ');
+  }
 
-getTaskTickets(emp: any): string {
-  return (emp.tasks || [])
-    .map((t: any) => t?.ticket)
-    .join(', ');
-}
-
-getManagerNames(emp: any): string {
-  return (emp.managers || [])
-    .map((m: any) => m?.name)
-    .join(', ');
-}
-
-  // VIEW
   viewEmployee(emp: any) {
     this.selectedEmployee = emp;
     this.showPopup = true;
@@ -270,63 +215,50 @@ getManagerNames(emp: any): string {
 
   closePopup() {
     this.showPopup = false;
+    this.selectedEmployee = null;
   }
 
-  // EDIT
   editEmployee(emp: any) {
     if (this.role !== 'admin') return;
-
-    this.router.navigate(['/add-employee'], {
-      queryParams: { id: emp._id }
-    });
+    this.router.navigate(['/add-employee'], { queryParams: { id: emp._id } });
   }
 
-  // DELETE
-  deleteEmployee(id: string) {
+ deleteEmployee(id: string) {
+  if (this.role !== 'admin') return;
 
-    if (this.role !== 'admin') return;
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'This Employee will be permanently deleted!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#f44336',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, Delete',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
 
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'This Employee will be deleted!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#f44336',
-      confirmButtonText: 'Yes, delete'
-    }).then(result => {
-
-      if (result.isConfirmed) {
-
-        this.http.delete(`http://localhost:5000/api/employee/delete/${id}`)
-          .subscribe( {
-            next: ()=> {
-                this.employees = this.employees.filter(emp => emp._id !== id);
-
-            // DATASOURCE
-            this.dataSource.data = this.employees;
-
-            //  UPDATE PAGINATION
-            this.updatePagedData();
-
-
+      this.http.delete(`http://localhost:5000/api/employee/delete/${id}?role=${this.role}`)
+        .subscribe({
+          next: () => {
+            this.loadEmployees();
 
             Swal.fire(
               'Deleted!',
-              'Employee removed successfully',
+              'Employee deleted successfully',
               'success'
             );
           },
           error: () => {
-            Swal.fire('Error', 'Delete failed', 'error');
+            Swal.fire(
+              'Error!',
+              'Failed to delete employee',
+              'error'
+            );
           }
         });
-      }
-    });
-  }
 
-  // REFRESH
-  refresh() {
-    this.loadEmployees();
-  }
+    }
+  });
+ }
 }
-

@@ -1,8 +1,9 @@
+const mongoose = require("mongoose");
 const Employee = require("../models/Employee");
 const bcrypt = require("bcryptjs");
 const { sendWelcomeEmail } = require("../services/mailService");
 
-// Generate Employee ID
+//  GENERATE EMPLOYEE ID 
 function generateEmployeeId() {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let empId = "";
@@ -14,11 +15,22 @@ function generateEmployeeId() {
   return "EMP" + empId;
 }
 
-/* ADD EMPLOYEE */
+//  PARSE 
+const safeParseArray = (data) => {
+  if (!data) return [];
+
+  try {
+    if (Array.isArray(data)) return data;
+    if (typeof data === "string") return JSON.parse(data);
+    return [];
+  } catch {
+    return [];
+  }
+};
+
+//  ADD EMPLOYEE 
 exports.addEmployee = async (req, res) => {
   try {
-    console.log(" API HIT RECEIVED");
-
     const {
       name,
       email,
@@ -30,30 +42,20 @@ exports.addEmployee = async (req, res) => {
       role,
       shift,
       projects,
-      managers
-      
+      managers,
+      tasks
     } = req.body;
 
-    //  PARSE FUNCTION
-    const safeParseArray = (data) => {
-      if (!data) return [];
-
-      try {
-        if (Array.isArray(data)) return data;
-        if (typeof data === "string") return JSON.parse(data);
-        return [];
-      } catch {
-        return [];
-      }
-    };
-
-    const parsedProjects = safeParseArray(projects);
+    const parsedProjects = safeParseArray(projects)
+     .filter(Boolean)
+  .map(id => new mongoose.Types.ObjectId(id));
     const parsedManagers = safeParseArray(managers);
+    const parsedTasks = safeParseArray(tasks);
 
-    // Generate password
-const tempPassword = Math.random().toString(36).slice(2, 10);
-const hashedPassword = await bcrypt.hash(tempPassword, 10);
-    //  Generate UNIQUE Employee ID
+    const tempPassword = Math.random().toString(36).slice(2, 10);
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+    // unique employeeId
     let employeeId;
     let exists = true;
 
@@ -63,7 +65,6 @@ const hashedPassword = await bcrypt.hash(tempPassword, 10);
       if (!user) exists = false;
     }
 
-    // Create employee
     const employee = new Employee({
       name,
       email,
@@ -72,33 +73,26 @@ const hashedPassword = await bcrypt.hash(tempPassword, 10);
       city,
       state,
       zip,
-      role: req.body.role || "employee",
+      role: role || "employee",
       shift: shift || "",
       password: hashedPassword,
-
-      employeeId, // 
-
-      profileImage: req.file
-        ? `/uploads/${req.file.filename}`
-        : null,
-
-       projects: parsedProjects,
-  managers: parsedManagers,
+      employeeId,
+      profileImage: req.file ? `/uploads/${req.file.filename}` : null,
+      projects: parsedProjects,
+      tasks: parsedTasks,
     });
 
-    //  Save
     await employee.save();
 
-    // Send email 
     await sendWelcomeEmail(email, tempPassword, name, employeeId);
 
-    return res.status(201).json({
+    res.status(201).json({
       message: "Employee created successfully",
       employee
     });
 
   } catch (err) {
-    console.log("ERROR:", err);
+    console.error("ADD EMPLOYEE ERROR:", err);
 
     if (err.code === 11000) {
       return res.status(400).json({
@@ -106,29 +100,196 @@ const hashedPassword = await bcrypt.hash(tempPassword, 10);
       });
     }
 
-    return res.status(500).json({
+    res.status(500).json({
       message: "Internal Server Error",
       error: err.message
     });
   }
 };
-// Profile Image 
 
+//  GET EMPLOYEES 
+exports.getEmployees = async (req, res) => {
+  try {
+    const { role, city, search, page = 1, limit = 10 } = req.query;
+
+    let matchStage = {};
+
+    if (role) matchStage.role = role;
+    if (city) matchStage.city = city;
+
+    if (search) {
+      matchStage.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+
+    const employees = await Employee.aggregate([
+      { $match: matchStage },
+
+      // PROJECTS LOOKUP
+      {
+        $lookup: {
+          from: "projects",
+          localField: "projects",
+          foreignField: "_id",
+          as: "projects"
+        }
+      },
+
+      // TASKS LOOKUP
+     {
+  $lookup: {
+    from: "tasks",
+    localField: "_id",
+    foreignField: "assignedTo",
+    as: "tasks"
+  }
+},
+
+      // OUTPUT 
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          phone: 1,
+          city: 1,
+          role: 1,
+          employeeId: 1,
+          profileImage: 1,
+          createdAt: 1,
+          updatedAt: 1,
+
+          //   projects 
+          projects: {
+            $map: {
+              input: "$projects",
+              as: "p",
+              in: {
+                _id: "$$p._id",
+                name: "$$p.name"
+              }
+            }
+          },
+
+         tasks: {
+  $map: {
+    input: { $ifNull: ["$tasks", []] },
+    as: "t",
+    in: {
+      _id: "$$t._id",
+      ticket: "$$t.ticket",
+      status: "$$t.status"
+    }
+  }
+}
+        }
+      },
+
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: parseInt(limit) }
+    ]);
+
+    const total = await Employee.countDocuments(matchStage);
+
+    res.json({
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      employees
+    });
+
+  } catch (err) {
+    console.error("GET EMPLOYEES ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET EMPLOYEE BY ID 
+exports.getEmployeeById = async (req, res) => {
+  try {
+    const id = new mongoose.Types.ObjectId(req.params.id);
+
+    const employee = await Employee.aggregate([
+      { $match: { _id: id } },
+// LOOKUP PROJECTS
+      {
+        $lookup: {
+          from: "projects",
+          localField: "projects",
+          foreignField: "_id",
+          as: "projects"
+        }
+      },
+// LOOKUP TASKS
+      {
+        $lookup: {
+          from: "tasks",
+          localField: "tasks",
+          foreignField: "_id",
+          as: "tasks"
+        }
+      },
+// PROJECT OUTPUT
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          phone: 1,
+          city: 1,
+          role: 1,
+          employeeId: 1,
+          profileImage: 1,
+          createdAt: 1,
+          updatedAt: 1,
+//   projects OUTPUT
+          projects: {
+            $map: {
+              input: "$projects",
+              as: "p",
+              in: {
+                _id: "$$p._id",
+                name: "$$p.name"
+              }
+            }
+          },
+// TASKS OUTPUT
+          tasks: {
+            $map: {
+              input: "$tasks",
+              as: "t",
+              in: {
+                _id: "$$t._id",
+                ticket: "$$t.ticket",
+                status: "$$t.status"
+              }
+            }
+          }
+        }
+      }
+    ]);
+
+    res.json(employee[0] || null);
+
+  } catch (err) {
+    console.error("GET ONE ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//  UPDATE PROFILE IMAGE 
 exports.updateProfileImage = async (req, res) => {
   try {
-    const employeeId = req.params.id;
-
     if (!req.file) {
-      return res.status(400).json({
-        message: "No file uploaded"
-      });
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
     const updated = await Employee.findByIdAndUpdate(
-      employeeId,
-      {
-        profileImage: `/uploads/${req.file.filename}`
-      },
+      req.params.id,
+      { profileImage: `/uploads/${req.file.filename}` },
       { new: true }
     );
 
@@ -138,13 +299,50 @@ exports.updateProfileImage = async (req, res) => {
     });
 
   } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
+    res.status(500).json({ message: err.message });
   }
 };
+
+exports.updateEmployee = async (req, res) => {
+  try {
+
+    const role = (req.query.role || '').toLowerCase();
+
+    // Only admin allowed
+    if (role !== 'admin') {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    const updated = await Employee.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    res.json({
+      message: "Employee updated successfully",
+      employee: updated
+    });
+
+  } catch (err) {
+    console.error("UPDATE ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//  DELETE EMPLOYEE 
 exports.deleteEmployee = async (req, res) => {
   try {
+
+    const role = (req.query.role || '').toLowerCase();
+
+    if (role !== 'admin') {
+      return res.status(403).json({ message: 'Only admin can delete' });
+    }
     const emp = await Employee.findByIdAndDelete(req.params.id);
 
     if (!emp) {
@@ -154,57 +352,6 @@ exports.deleteEmployee = async (req, res) => {
     res.json({ message: "Employee deleted successfully" });
 
   } catch (error) {
-    console.error("DELETE ERROR:", error);
     res.status(500).json({ message: "Delete failed" });
-  }
-};
-
-/* GET EMPLOYEES */
-exports.getEmployees = async (req, res) => {
-  try {
-    const {
-      role,
-      city,
-      search,
-      page = 1,
-      limit = 10
-    } = req.query;
-
-    let filter = {};
-
-    // FILTERS
-    if (role) filter.role = role;
-    if (city) filter.city = city;
-
-    // SEARCH (name/email)
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } }
-      ];
-    }
-
-    const skip = (page - 1) * limit;
-
-    const employees = await Employee.find(filter)
-      .skip(skip)
-      .limit(parseInt(limit))
-      .sort({ createdAt: -1 });
-
-    const total = await Employee.countDocuments(filter);
-
-    return res.status(200).json({
-      total,
-      page: parseInt(page),
-      pages: Math.ceil(total / limit),
-      employees
-    });
-
-  } catch (err) {
-    console.log("GET EMPLOYEES ERROR:", err);
-
-    return res.status(500).json({
-      message: err.message
-    });
   }
 };

@@ -26,6 +26,14 @@ exports.addProject = async (req, res) => {
     });
 
     await project.save();
+     const Employee = require("../models/Employee");
+
+    if (employees && employees.length > 0) {
+      await Employee.updateMany(
+        { _id: { $in: employees } },
+        { $addToSet: { projects: project._id } }
+      );
+    }
 
     res.status(201).json({
       message: "Project added successfully",
@@ -38,7 +46,7 @@ exports.addProject = async (req, res) => {
   }
 };
 
-/* GET ALL */
+/* GET ALL 
 exports.getProjects = async (req, res) => {
   try {
     const {
@@ -80,6 +88,90 @@ exports.getProjects = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+};*/
+
+/*exports.getProjects = async (req, res) => {
+  try {
+
+    const { role, userId, page = 1, limit = 10, status, category, search } = req.query;
+
+    let filter = {};
+
+    // ADMIN → all projects
+    if (role === "Admin") {
+      filter = {};
+    }
+
+    // EMPLOYEE / MANAGER → only assigned projects
+    else {
+      filter = {
+        $or: [
+          { manager: userId },
+          { employees: userId }
+        ]
+      };
+    }
+
+    if (status) filter.status = status;
+    if (category) filter.category = category;
+
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    const projects = await Project.find(filter)
+      .populate("employees", "name")
+      .populate("manager", "name")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const total = await Project.countDocuments(filter);
+
+    res.json({
+      data: projects,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit)
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};*/
+
+
+exports.getProjects = async (req, res) => {
+  try {
+
+    const { role, userId } = req.query;
+
+    let filter = {};
+
+    if (role === "admin") {
+      filter = {};
+    }
+
+    else if (role === "manager") {
+      filter.manager =  new mongoose.Types.ObjectId(userId);
+    }
+
+    else if (role === "employee") {
+      filter.employees = new mongoose.Types.ObjectId(userId);
+    }
+
+    const projects = await Project.find(filter)
+      .populate("employees", "name")
+      .populate("manager", "name");
+
+    res.json({ data: projects });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 /* GET by id */
@@ -88,7 +180,21 @@ exports.getProjectById = async (req, res) => {
     const project = await Project.findById(req.params.id)
      .populate('employees', 'name')   
   .populate('manager', 'name'); 
-    res.status(200).json(project);
+    res.status(200).json({ data: project });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+exports.getProjectsByEmployee = async (req, res) => {
+  try {
+    const employeeId = req.params.id;
+
+    const projects = await Project.find({
+      employees: employeeId
+    }).select("name status");
+
+    res.json(projects);
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -116,6 +222,12 @@ exports.updateProject = async (req, res) => {
 /* DELETE */
 exports.deleteProject = async (req, res) => {
   try {
+
+     const role = (req.query.role || '').toLowerCase();
+    if (role !== 'admin') {
+      return res.status(403).json({ message: 'Not allowed' });
+    }
+
     await Project.findByIdAndDelete(req.params.id);
 
     res.status(200).json({

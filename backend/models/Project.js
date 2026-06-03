@@ -25,6 +25,13 @@ const projectSchema = new mongoose.Schema(
       ref: "Employee"
     }
   ],
+tasks: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Task"
+  }
+],
+
     status: {
   type: String,
   enum: ['Pending', 'In Progress', 'Completed'],

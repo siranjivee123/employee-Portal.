@@ -37,14 +37,16 @@ export class AddEmployeeComponent implements OnInit {
   states: any[] = [];
   cities: any[] = [];
 
-//projectsList: any[] = [];
+projects: any[] = [];
 //managerList: any[] = [];
   //   FILTER ARRAYS
   filteredStates: any[] = [];
   filteredCities: any[] = [];
 
-  roles: string[] = ['employee', 'manager',  'admin'];
-
+roles = [
+  { label: 'Employee', value: 'employee' },
+  { label: 'Manager', value: 'manager' }
+];
   isLoadingCities = false;
   cityError = '';
 
@@ -79,9 +81,8 @@ export class AddEmployeeComponent implements OnInit {
     this.techForm = this.fb.group({
       role: ['', Validators.required],
       shift: ['', Validators.required],
-  //     projects: [[]],
+     projects: [],
   // managers: [[]]
-      
     });
 
     // LOAD STATES
@@ -92,7 +93,22 @@ export class AddEmployeeComponent implements OnInit {
 
         this.filteredStates = [...this.states];
       });
+        this.loadProjects();
   }
+
+
+  loadProjects() {
+  this.http.get<any>('http://localhost:5000/api/projects/all')
+    .subscribe({
+      next: (res) => {
+        this.projects = res.data || [];   
+        console.log("Projects:", this.projects);
+      },
+      error: (err) => {
+        console.error("Error loading projects", err);
+      }
+    });
+}
 
   // FILE UPLOAD
   onFileChange(event: any) {
@@ -182,7 +198,8 @@ export class AddEmployeeComponent implements OnInit {
 
     const data = {
       ...this.basicForm.value,
-      ...this.techForm.value
+      ...this.techForm.value,
+        role: this.techForm.value.role
     };
 
     Object.keys(data).forEach(key => {

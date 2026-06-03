@@ -22,7 +22,26 @@ label {
   font-weight: 600;
   margin-bottom: 5px;
 }
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  appearance: none; 
+  -webkit-appearance: none;
+  -moz-appearance: none;
 
+  /*  dropdown arrow */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
 input, textarea {
   padding: 8px;
   border-radius: 5px;
@@ -64,3 +83,5 @@ p {
     margin: 20px;
   }
 }
+
+

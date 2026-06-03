@@ -211,6 +211,9 @@ button:disabled {
   mat-horizontal-stepper {
     padding: 10px;
   }
+  mat-step-header .mat-step-label {
+  font-weight: 600;
+}
 }
 
 /* DROPDOWN SEARCH */
