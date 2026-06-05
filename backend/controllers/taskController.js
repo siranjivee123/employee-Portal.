@@ -118,7 +118,7 @@ exports.addTask = async (req, res) => {
 
     let match = {};
 
-    // ADMIN → see all
+    // ADMIN to see all
     if (role === "admin") {
       match = {};
     }
@@ -152,7 +152,7 @@ exports.addTask = async (req, res) => {
   }
 };
 
-   
+   // GET TASKS BY PROJECT:
 
 exports.getTasksByEmployeeProjects = async (req, res) => {
   try {
