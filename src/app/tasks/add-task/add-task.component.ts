@@ -86,26 +86,7 @@ filteredProjects: any[] = [];
       }
     });
 }
-
-
-
-
-  
-/*onEmployeeChange(empId: string) {
-  this.http.get<any[]>(`http://localhost:5000/api/projects/employee/${empId}`)
-    .subscribe({
-      next: (projects) => {
-        this.filteredProjects = projects || [];
-
-        // reset selected project
-        this.taskForm.patchValue({ project: '' });
-      },
-      error: () => {
-        this.filteredProjects = [];
-      }
-    });
-}*/
-  
+// FILTER PROJECTS BASED ON ASSIGNED BY
  onEmployeeChange(empId: string) {
 
   const employee = this.assignedByList.find(e => e._id === empId);

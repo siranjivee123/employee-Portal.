@@ -4,6 +4,12 @@
   <button class="add-btn" *ngIf="role === 'admin'" routerLink="/add-employee">
     Add New Employee
   </button>
+  <button 
+  class="csv-btn"
+  *ngIf="role === 'admin'"
+  (click)="exportEmployeeCSV()">
+  Export CSV
+</button>
 
   <div class="filters">
     <input
@@ -31,6 +37,9 @@
       <option value="project-desc">Project (Z - A)</option>
     </select>
   </div>
+</div>
+<div *ngIf="isLoading" class="loader">
+  Fetching Employee data...
 </div>
 
 <div class="card-scroll">

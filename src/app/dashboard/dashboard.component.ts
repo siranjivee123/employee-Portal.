@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../services/dashboard.service';
-
+import { ThemeService } from '../services/theme.service';
 import { EmployeeListComponent } from '../employee-list/employee-list';
 import { ProjectsComponent } from '../projects/projects';
 import { TaskListComponent } from '../tasks/task-list/task-list.component';
@@ -26,8 +26,9 @@ Chart.register(...registerables);
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
-
   isSidebarOpen = false;
+  isDarkMode = false;
+  dashboardData: any;   
   activeView: string = 'dashboard';
   role: string = '';
   menuItems: any[] = [];
@@ -82,7 +83,8 @@ employeeProjectNames: string[] = [];
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private themeService: ThemeService
   ) {}
 normalizeData(data: any) {
   return {
@@ -102,17 +104,13 @@ normalizeData(data: any) {
     // ROLE
     this.role = (localStorage.getItem('role') || '').toLowerCase();
 
-    // MENU FILTER
-    this.menuItems = this.allMenuItems.filter(item =>
+    // MENU Fiters:
+     this.menuItems = this.allMenuItems.filter(item =>
       item.roles.includes(this.role)
     );
 
-     //  LOAD EMPLOYEE PROJECTS
- 
-  
 
-
-    // VIEW CONTROL
+     // VIEW CONTROL
     this.route.queryParams.subscribe(params => {
       this.activeView = params['view'] || 'dashboard';
     
@@ -121,8 +119,19 @@ normalizeData(data: any) {
     this.loadDashboardData();
   }
 });
-
   }
+
+// THEME
+   toggleTheme() {
+     this.isDarkMode = !this.isDarkMode;
+
+  if (this.isDarkMode) {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+}
+ 
 
  ngAfterViewInit() {
 
@@ -135,6 +144,7 @@ normalizeData(data: any) {
   loadDashboardData() {
   this.dashboardService.getDashboardData().subscribe({
     next: (res: any) => {
+       this.dashboardData = res;
 
       console.log("API DATA ", res); 
  //  NORMALIZE DATA
@@ -186,6 +196,8 @@ normalizeData(data: any) {
 
   if (this.taskChart) this.taskChart.destroy();
 
+  const textColor = '#000000';
+
   this.taskChart = new Chart(this.taskChartRef.nativeElement, {
     type: 'pie',
     data: {
@@ -197,14 +209,27 @@ normalizeData(data: any) {
           tasks?.inProgress || 0
         ],
         backgroundColor: ['#4CAF50', '#FF9800', '#2196F3']
-      }]
+       
+    },  ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: textColor
+          }
+        }
+      }
     }
+        
+    
+    
   });
 }
 
   createProjectChart(projects: any) {
     if (this.projectChart) this.projectChart.destroy();
-
+const textColor =  '#000000';
     this.projectChart = new Chart( 
        this.projectChartRef.nativeElement,
 
@@ -220,14 +245,26 @@ normalizeData(data: any) {
             projects?.inProgress || 0
           ],
           backgroundColor: ['#4CAF50', '#FF9800', '#2196F3']
-        }]
+       
+    },  ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: textColor
+          }
+        }
       }
-    });
-  }
-
+    }
+        
+    
+    
+  });
+}
   createLeaveChart(leaves: any) {
     if (this.leaveChart) this.leaveChart.destroy();
-
+const textColor =  '#000000';
     this.leaveChart = new Chart(
        this.leaveChartRef.nativeElement, 
 
@@ -242,12 +279,24 @@ normalizeData(data: any) {
             leaves?.pending || 0,
             leaves?.rejected || 0
           ],
-          backgroundColor: ['#4CAF50', '#FF9800', '#F44336']
-        }]
+            backgroundColor: ['#4CAF50', '#FF9800', '#2196F3']
+       
+    },  ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: textColor
+          }
+        }
       }
-    });
-  }
-
+    }
+        
+    
+    
+  });
+}
   // SIDEBAR
 
   toggleSidebar() {

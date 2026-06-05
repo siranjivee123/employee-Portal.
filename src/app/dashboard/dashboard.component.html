@@ -41,6 +41,19 @@
     <h2 *ngIf="activeView === 'projects'">Project Management</h2>
     <h2 *ngIf="activeView === 'tasks'">Task Management</h2>
     <h2 *ngIf="activeView === 'leave'">Leave Management</h2>
+     <!--  THEME TOGGLE BUTTON -->
+  <button 
+    *ngIf="role === 'admin'"
+    class="theme-toggle"
+    (click)="toggleTheme()">
+
+    <span class="material-icons">
+      {{  isDarkMode ? 'light_mode' : 'dark_mode' }}
+    </span>
+
+    {{  isDarkMode ? 'Light Theme' : 'Dark Theme' }}
+
+  </button>
 
     <button class="logout-btn" (click)="logout()">Logout</button>
 

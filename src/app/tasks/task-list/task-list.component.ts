@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 // Angular Material
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -18,6 +19,8 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
     MatTableModule,
     MatPaginatorModule,
     RouterModule,
+    MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.css']
@@ -51,18 +54,12 @@ export class TaskListComponent implements OnInit, AfterViewInit {
   sortOption = '';
 
   showPopup = false;
+  isLoading = false;
   selectedTask: any = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  /*ngOnInit() {
-    this.loadTasks();
-
-    // safer filter setup
-    this.dataSource.filterPredicate = (data: any, filter: string) => {
-      return (data.ticket || '').toLowerCase().includes(filter);
-    };
-  }*/
+ 
 role: string = '';
 userId: string = '';
 ngOnInit() {
@@ -88,9 +85,7 @@ ngOnInit() {
     this.dataSource.paginator = this.paginator;
   }
 
-  // 
   // LOAD TASKS 
-  // 
   loadTasks() {
 this.http.get<any>(
   `http://localhost:5000/api/tasks/all?role=${this.role}&userId=${this.userId}`
@@ -126,13 +121,71 @@ this.http.get<any>(
       });
   }
 
-  //
   // SORT
-  // 
   sortTasksByLatest() {
     this.tasks.sort((a: any, b: any) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+  }
+
+
+  exportTaskCSV() {
+
+  if (!this.dataSource.data || this.dataSource.data.length === 0) {
+    Swal.fire('No Data', 'No tasks available to export', 'warning');
+    return;
+  }
+  this.isLoading = true;
+
+  setTimeout(() => {
+
+  const dataToExport = this.dataSource.data;
+
+  const csvData: any[] = dataToExport.map((task: any, index: number) => ({
+    "S.No": index + 1,
+    "Ticket": task.ticket || '',
+    "Description": task.description || '',
+    "Project": task.project?.name || '',
+    "Shift": task.shift || '',
+    "Assigned By": task.assignedBy?.name || '',
+    "Effort": task.effort || '',
+    "Status": task.status || '',
+    "Created Date": task.createdAt
+      ? new Date(task.createdAt).toLocaleString()
+      : ''
+  }));
+
+  const headers = Object.keys(csvData[0]);
+  const csvRows: string[] = [];
+
+  // Header
+  csvRows.push(headers.join(','));
+
+  // Rows
+  csvData.forEach(row => {
+    const values = headers.map(header => {
+      let val = (row as any)[header]?.toString() || '';
+      val = val.replace(/"/g, '""');
+      return `"${val}"`;
+    });
+    csvRows.push(values.join(','));
+  });
+
+  const csvString = csvRows.join('\n');
+
+  const blob = new Blob([csvString], {
+    type: 'text/csv;charset=utf-8;'
+  });
+
+  const url = window.URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'tasks.csv';
+  link.click();
+
+  Swal.fire('Success', 'Task CSV downloaded!', 'success');
+}, 3000);
   }
 
   
@@ -154,14 +207,7 @@ this.http.get<any>(
       );
     }
 
-    // if (this.selectedProject) {
-    //   data = data.filter(t =>
-    //     (t.project || '')
-    //       .toString()
-    //       .toLowerCase()
-    //       .includes(this.selectedProject.toLowerCase())
-    //   );
-    // }
+   
 if (this.selectedProject) {
   data = data.filter(t =>
     (t.project?.name || '')
@@ -181,17 +227,7 @@ if (this.selectedProject) {
         );
         break;
 
-      // case 'project-asc':
-      //   data.sort((a, b) =>
-      //     (a.project || '').toString().localeCompare((b.project || '').toString())
-      //   );
-      //   break;
-
-      // case 'project-desc':
-      //   data.sort((a, b) =>
-      //     (b.project || '').toString().localeCompare((a.project || '').toString())
-      //   );
-      //   break;
+     
       case 'project-asc':
   data.sort((a, b) =>
     (a.project?.name || '').localeCompare(b.project?.name || '')

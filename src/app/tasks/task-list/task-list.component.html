@@ -10,6 +10,13 @@
     Add New Task
   </button>
 
+   <button 
+  class="csv-btn"
+  *ngIf="role === 'admin'"
+  (click)="exportTaskCSV()">
+  Export CSV
+</button>
+
   <div class="filters">
 
 <!-- Search -->
@@ -44,7 +51,9 @@
 
   </div>
 </div>
-
+<div *ngIf="isLoading" class="loader">
+  Fetching Task Data...
+</div>
 <!-- Table -->
 <div class="table-card">
   <h3>Task List</h3>
@@ -114,9 +123,15 @@
       <th mat-header-cell *matHeaderCellDef> Actions </th>
       <td mat-cell *matCellDef="let t">
 
-        <button (click)="viewTask(t)">View</button>
-        <button (click)="editTask(t)" *ngIf="role === 'admin'">Edit</button>
-        <button (click)="deleteTask(t._id)" *ngIf="role === 'admin'">Delete</button>
+ <button mat-icon-button color="primary" (click)="viewTask(t)">
+      <mat-icon>visibility</mat-icon>
+    </button>
+        <button mat-icon-button color="accent" (click)="editTask(t)" *ngIf="role === 'admin'">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteTask(t._id)" *ngIf="role === 'admin'">
+          <mat-icon>delete</mat-icon>
+        </button>
 
       </td>
     </ng-container>
@@ -141,7 +156,8 @@
 </mat-paginator>
 
 <!--  TASK POPUP -->
-<div class="popup" *ngIf="showPopup">
+  <div class="popup-overlay" *ngIf="showPopup">
+<div class="popup">
 
 <!-- HEADER -->
   <div class="popup-header">
@@ -150,6 +166,7 @@
   </div>
 
 <!-- BODY -->
+
   <div class="popup-body">
     <p><b>Ticket:</b> {{ selectedTask?.ticket }}</p>
     <p><b>Description:</b> {{ selectedTask?.description }}</p>

@@ -1,7 +1,176 @@
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
+/* @import '@angular/material/prebuilt-themes/indigo-pink.css';
 @import './material-theme.scss';
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #f5f5f5;
+   background: #f5f5f5;   /* LIGHT 
+  transition: background 0.3s ease;
+}
+
+body.dark-mode {
+  background: #121212;   /* DARK 
+}
+
+
+
+:root {
+  --bg: #f5f5f5;
+  --text: #111;
+  --card-bg: #ffffff;
+  --sidebar-bg: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  --header-bg: #ffffff;
+  --button-bg: #3b82f6;
+  --button-text: #ffffff;
+}
+
+body.dark-mode {
+  --bg: #121212;
+  --text: #ffffff;
+  --card-bg: #1e1e1e;
+  --sidebar-bg: #1e1e1e;
+  --header-bg: #1a1a1a;
+  --button-bg: #333;
+  --button-text: #ffffff;
+}
+:root {
+  --bg: #f4f7fc;
+  --text: #2c3e50;
+  --card-bg: #ffffff;
+  --sidebar-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-text: #2c3e50;
+  --border: #e0e0e0;
+  --hover: #e3f2fd;
+}
+
+body.dark-mode {
+  --bg: #121212;
+  --text: #ffffff;
+  --card-bg: #1e1e1e;
+  --sidebar-bg: #1a1a1a;
+  --input-bg: #2a2a2a;
+  --input-text: #ffffff;
+  --border: #333;
+  --hover: #2c2c2c;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+} */
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import './material-theme.scss';
+
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  transition: background 0.3s ease;
+}
+
+/* LIGHT THEME */
+:root {
+  --bg: #f4f7fc;
+  --text: #2c3e50;
+  --card-bg: #ffffff;
+  --sidebar-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-text: #2c3e50;
+  --border: #e0e0e0;
+  --hover: #e3f2fd;
+  --button-bg: #1976d2;
+  --button-text: #ffffff;
+}
+
+/* DARK THEME */
+body.dark-mode {
+  --bg: #121212;
+  --text: #ffffff;
+  --card-bg: #1e1e1e;
+  --sidebar-bg: #1a1a1a;
+  --input-bg: #2a2a2a;
+  --input-text: #ffffff;
+  --border: #333;
+  --hover: #2c2c2c;
+  --button-bg: #90caf9;
+  --button-text: #000;
+}
+
+
+
+:root {
+  --bg: #f5f7fb;
+  --card-bg: #ffffff;
+  --text: #222;
+  --text-secondary: #666;
+  --border: #ddd;
+  --input-bg: #ffffff;
+  --input-text: #000;
+}
+
+/* DARK MODE */
+body.dark-mode {
+  --bg: #121212;
+  --card-bg: #1e1e1e;
+  --text: #ffffff;
+  --text-secondary: #bbbbbb;
+  --border: #333;
+  --input-bg: #2a2a2a;
+  --input-text: #ffffff;
+}
+
+/* APPLY VARIABLES */
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+table {
+  background: var(--card-bg) ;
+  color: var(--text) ;
+}
+
+th, td {
+  color: var(--text) ;
+  border-color: var(--border) ;
+}
+
+
+/* DARK MODE FIX */
+
+/* TABLE */
+.mat-mdc-table {
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+}
+
+.mat-mdc-header-row,
+.mat-mdc-row {
+  background: var(--card-bg) !important;
+}
+
+.mat-mdc-header-cell,
+.mat-mdc-cell {
+  color: var(--text) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* PAGINATOR */
+.mat-mdc-paginator {
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+}
+
+/* INPUT FIELDS */
+.mat-mdc-text-field-wrapper {
+  background: var(--input-bg) !important;
+}
+
+.mat-mdc-input-element {
+  color: var(--input-text) !important;
+}
+
+/* SELECT DROPDOWN */
+.mat-mdc-select-value {
+  color: var(--input-text) !important;
 }

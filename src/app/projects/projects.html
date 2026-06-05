@@ -13,7 +13,7 @@
   <button 
   class="csv-btn"
   *ngIf="role === 'admin'"
-  (click)="exportCSV()">
+  (click)="exportProjectCSV()">
   Export CSV
 </button>
 
@@ -52,7 +52,7 @@
   </div>
 </div>
 <div *ngIf="isLoading" class="loader">
-  Fetching project data...
+  Fetching Project Data...
 </div>
 <!-- Table -->
 <div class="table-card">
@@ -188,8 +188,9 @@
 </mat-paginator>
 
 <!-- POPUP -->
-<div class="popup" *ngIf="showPopup">
+<div class="popup-overlay" *ngIf="showPopup">
 
+ <div class="popup">
   <!-- HEADER -->
   <div class="popup-header">
     <span>Project Details</span>
@@ -227,4 +228,5 @@
 
   </div>
 
+</div>
 </div>

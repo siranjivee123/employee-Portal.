@@ -40,13 +40,14 @@ export class EmployeeListComponent implements OnInit, AfterViewInit {
   selectedDate = '';
   sortOption = '';
 
-  // USER AUTH INFO
+  // USER AUTH 
   role: string = '';
   loggedInEmployeeId: string = '';
 
   // POPUP
   showPopup = false;
   selectedEmployee: any = null;
+  isLoading = false;
   //HOVERED IMAGE:
   hoveredEmp: string | null = null;
 
@@ -141,6 +142,60 @@ onImageChange(event: any, emp: any) {
         }
       });
   }
+  exportEmployeeCSV() {
+
+  if (!this.paginatedData || this.paginatedData.length === 0) {
+    Swal.fire('No Data', 'No employees available to export', 'warning');
+    return;
+  }
+
+  this.isLoading = true;
+
+  setTimeout(() => {
+
+    const dataToExport = this.paginatedData;
+
+    const csvData: any[] = dataToExport.map((emp: any, index: number) => ({
+      "S.No": index + 1,
+      "Name": emp.name || '',
+      "Email": emp.email || '',
+      "Projects": this.getProjectNames(emp) || '',
+      "Tasks": this.getTaskTickets(emp) || '',
+      "Created Date": emp.createdAt
+        ? new Date(emp.createdAt).toLocaleString()
+        : ''
+    }));
+
+    const headers = Object.keys(csvData[0] || {});
+    const csvRows: string[] = [];
+
+    csvRows.push(headers.join(','));
+
+    csvData.forEach(row => {
+      const values = headers.map(header => {
+        let val = (row as any)[header]?.toString() || '';
+        val = val.replace(/"/g, '""');
+        return `"${val}"`;
+      });
+      csvRows.push(values.join(','));
+    });
+
+    const csvString = csvRows.join('\n');
+
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'employees.csv';
+    link.click();
+
+    this.isLoading = false;
+
+    Swal.fire('Success', 'Employee CSV downloaded!', 'success');
+
+  }, 3000);
+}
 
   applyFilter() {
     const keyword = this.searchText.trim().toLowerCase();

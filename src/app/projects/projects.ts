@@ -56,9 +56,7 @@ dataSource = new MatTableDataSource<any>([]);
 
   constructor(private router: Router,private http: HttpClient) {}
 
-  // ngOnInit() {
-  //   this.loadProjects();
-  // }
+  
 role: string = '';
 userId: string = '';
 
@@ -69,25 +67,7 @@ ngOnInit() {
   this.loadProjects();
 }
  
-// LOAD DATA:
-/*loadProjects() {
-  this.http.get<any>('http://localhost:5000/api/projects/all')
-    .subscribe({
-      next: (res) => {
-        console.log('Projects from API:', res);
 
-        this.projects = res.data;
-        this.dataSource = new MatTableDataSource(this.projects);
-
-        setTimeout(() => {
-          this.dataSource.paginator = this.paginator;
-        });
-      },
-      error: () => {
-        Swal.fire('Error', 'Failed to load projects', 'error');
-      }
-    });
-}*/
 
 loadProjects() {
 
@@ -117,7 +97,7 @@ loadProjects() {
 }
 
 // EXPORTING CSV:
-exportCSV() {
+exportProjectCSV() {
 
   if (!this.projects || this.projects.length === 0) {
     Swal.fire('No Data', 'No projects available to export', 'warning');

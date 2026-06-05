@@ -62,54 +62,7 @@ export class AddProjectComponent implements OnInit {
     }
   }
 
-  //  LOAD EMPLOYEES
-  /*loadEmployees() {
-    this.http.get<any>('http://localhost:5000/api/employee/all')
-      .subscribe({
-        next: (res: any) => {
-                  console.log('FULL RESPONSE:', res);
-
-
-          const all = res.employees || res || [];
-                  console.log('ALL EMPLOYEES:', all);
-
-          this.managersList = [];
-          this.employeeList = [];
-           all.forEach((emp: any) => {
-          this.managersList.unshift(emp);
-          this.employeeList.unshift(emp);
-        });
-           console.log('MANAGERS:', this.managersList);
-        console.log('EMPLOYEES:', this.employeeList);
-        },
-        error: () => {
-          Swal.fire('Error', 'Failed to load employees', 'error');
-        }
-      });
-  }*/
-/*loadEmployees() {
-  this.http.get<any>('http://localhost:5000/api/employee/all')
-    .subscribe({
-      next: (res: any) => {
-
-        const all = res.employees || res || [];
-
-        // ONLY managers
-        this.managersList = all.filter((e: any) =>
-          e.role === 'Manager'
-        );
-
-        // ONLY employees
-        this.employeeList = all.filter((e: any) =>
-          e.role === 'Employee'
-        );
-
-      },
-      error: () => {
-        Swal.fire('Error', 'Failed to load employees', 'error');
-      }
-    });
-}*/
+ 
 
 loadEmployees() {
   this.http.get<any>('http://localhost:5000/api/employee/all')

@@ -11,18 +11,21 @@
 .dashboard-container {
   display: flex;
   height: 100vh;
-  background: #f5f7fb;
-  color: #333;
+  /* background: #f5f7fb;
+  color: #333; */
+  background: var(--bg);
+  color: var(--text);
   font-family: Arial, sans-serif;
 }
 
 /* Sidebar */
 .sidebar {
   width: 220px;
-  background: #ffffff;
+  /* background: #ffffff; */
   padding: 20px;
-  border-right: 1px solid #ddd;
-}
+  background: var(--card-bg);
+  border-right: 1px solid var(--border);
+} 
 
 .logo {
   text-align: center;
@@ -43,14 +46,44 @@
   margin: 8px 0;
   cursor: pointer;
   border-radius: 6px;
-  color: #555;
+  /* color: #555; */
+  color: var(--text-secondary);
 }
 
 .sidebar li.active,
 .sidebar li:hover {
-  background: #e3f2fd;
+  /* background: #e3f2fd;
+  color: #1976d2; */
+   background: rgba(25,118,210,0.15);
   color: #1976d2;
 }
+
+
+.csv-btn {
+  padding: 10px 15px;
+  border: none;
+  background: #4caf50;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.csv-btn:hover {
+  background: #388e3c;
+}
+
+.loader {
+  margin: 15px 0;
+  padding: 12px;
+  background: #fff3cd;
+  color: #856404;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+  animation: blink 1s infinite;
+}
+
 
 .material-icons {
   font-size: 20px;
@@ -71,7 +104,8 @@
 }
 
 .header h2 {
-  color: #2c3e50;
+  /* color: #2c3e50; */
+  color: var(--text);
 }
 
 /* Logout */
@@ -120,17 +154,20 @@
 .filters select {
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid #90caf9;
+  /* border: 1px solid #90caf9;
   background: lightslategray;
-  color: white;
+  color: white; */
+   background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--border);
   font-size: 14px;
   min-width: 200px;
 }
 
 /* Placeholder */
 .filters input::placeholder {
-  color: white;
-  opacity: 0.9;
+   color: var(--input-placeholder);
+  opacity: 1;
 }
 
 /* Focus */
@@ -143,8 +180,10 @@
 
 /* Table Card */
 .table-card {
-  background: white;
-  border: 1px solid #ddd;
+  /* background: white;
+  border: 1px solid #ddd; */
+   background: var(--card-bg);
+  border: 1px solid var(--border);
   padding: 20px;
   border-radius: 10px;
 }
@@ -152,7 +191,7 @@
 /* Title */
 .table-card h3 {
   margin-bottom: 15px;
-  color: #2c3e50;
+  color: var(--text);
 }
 .table-wrapper {
   max-height: 400px;
@@ -181,10 +220,12 @@ table {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #f1f3f6 !important;
+  /* background: #f1f3f6 !important; */
+   background: var(--card-bg) !important;
 }
 .mat-row:hover{
-      background: #f9fbff;
+      /* background: #f9fbff; */
+       background: rgba(255,255,255,0.05);
 
 }
 
@@ -198,15 +239,18 @@ th {
   padding: 12px;
   text-align: left;
   font-weight: 600;
-  color: grey;
+  /* color: grey; */
+   color: var(--text-secondary);
 }
 
 /* Data row */
 td {
   padding: 12px;
-  border-top: 1px solid #eee;
+  /* border-top: 1px solid #eee; */
   font-weight: 500;
-  color: black;
+  /* color: black; */
+  color: var(--text);
+  border-top: 1px solid var(--border);
 }
 
 /* Hover */
@@ -241,7 +285,8 @@ td button:nth-child(3) {
 /* Pagination  */
 mat-paginator {
   margin-top: 15px;
-  color: #2c3e50;
+  /* color: #2c3e50; */
+   color: var(--text);
   font-size: 16px;
   font-weight: 600;
 }
@@ -342,30 +387,55 @@ mat-paginator {
 }
 .mat-row td {
   font-weight: 500;
-  color: grey;
+  /* color: grey; */
+  color: var(--text);
 }
-
-.popup {
+.popup-overlay {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 320px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0,0,0,0.5);
+
+  display: flex;
+  justify-content: center;     
+  align-items: flex-start;     
+  padding-top: 60px;           
+
   z-index: 1000;
-  animation: slideIn 0.3s ease;
+}
+.popup {
+ 
+  /* top: 20px;
+  right: 20px; */
+  width: 320px;
+   max-width: 420px;
+   max-height: 80vh;
+  /* background: #fff; */
+   background: var(--card-bg);
+  color: var(--text);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+   display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  /* animation: slideIn 0.3s ease; */
+   animation: slideDown 0.3s ease;
+   overflow: hidden;
 }
 
 .popup-header {
-  position: relative;
+  position: relative; 
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #1976d2;
+  /* background: #1976d2; */
+  background: var(--primary, #1976d2);
   color: white;
   padding: 10px;
-  border-radius: 10px 10px 0 0;
+  border-radius: 12px 12px 0 0;
 }
 
 .popup-header span {
@@ -387,12 +457,30 @@ mat-paginator {
   cursor: pointer;
 }
 
+.close-btn:hover {
+  transform: scale(1.1);
+}
+
 .popup-body {
   padding: 12px;
   font-size: 14px;
+   line-height: 1.6;
+  color: var(--text);
+}
+.popup-body p {
+  margin: 8px 0;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 5px;
 }
 
-@keyframes slideIn {
+.popup-body strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+@keyframes slideDownCenter {
   from {
     transform: translateX(100%);
     opacity: 0;
