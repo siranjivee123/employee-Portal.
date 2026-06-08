@@ -119,7 +119,7 @@ body.dark-mode {
   --input-text: #ffffff;
 }
 
-/* APPLY VARIABLES */
+/*  VARIABLES */
 body {
   background: var(--bg);
   color: var(--text);
@@ -136,7 +136,7 @@ th, td {
 }
 
 
-/* DARK MODE FIX */
+/* DARK MODE  */
 
 /* TABLE */
 .mat-mdc-table {

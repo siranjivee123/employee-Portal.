@@ -27,11 +27,18 @@ Chart.register(...registerables);
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
   isSidebarOpen = false;
+  // THEME
   isDarkMode = false;
+
+  // DATA
   dashboardData: any;   
+  // VIEW CONTROL
   activeView: string = 'dashboard';
+  // ROLE & MENU
   role: string = '';
+  
   menuItems: any[] = [];
+  // EMPLOYEE DETAILS
 employeeProjectNames: string[] = [];
   //DASHBOARD VALUES
   totalEmployees = 0;

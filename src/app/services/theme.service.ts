@@ -18,7 +18,7 @@ export class ThemeService {
     this.darkMode.next(isDark);
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 
-    //  toggle class :
+    //  toggle  :
     document.body.classList.toggle('dark-mode', isDark);
   }
 }
